@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Pu1GLSX2u52E+HkLqdBlgi06taDtjQDHI3O7xNuyXxgZn6IL3zaIpviqNi2JenrTz3Vi+Tyi++xmD1+Z3H7H9w==",
+  "success": true,
+  "projectFilePath": "/Users/jani/WebDev/SourceCodes/Solita Dev Academy 2023/CityBikeDB/CityBikeDB.sqlproj",
+  "expectedPackageFiles": [
+    "/Users/jani/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.0/microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
+    "/Users/jani/.nuget/packages/microsoft.netframework.referenceassemblies.net46/1.0.0/microsoft.netframework.referenceassemblies.net46.1.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
