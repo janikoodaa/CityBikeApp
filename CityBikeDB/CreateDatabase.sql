@@ -18,14 +18,14 @@ GO
 CREATE TABLE [citybike].[Stations]
 (
     [Id] INT NOT NULL PRIMARY KEY,
-    [NameFin] VARCHAR(100) NOT NULL,
-    [NameSwe] VARCHAR(100) NOT NULL,
-    [NameEng] VARCHAR(100) NOT NULL,
-    [AddressFin] VARCHAR(100) NOT NULL,
-    [AddressSwe] VARCHAR(100) NOT NULL,
-    [CityFin] VARCHAR(50),
-    [CitySwe] VARCHAR(50),
-    [Operator] VARCHAR(100),
+    [NameFin] NVARCHAR(100) NOT NULL,
+    [NameSwe] NVARCHAR(100) NOT NULL,
+    [NameEng] NVARCHAR(100) NOT NULL,
+    [AddressFin] NVARCHAR(100) NOT NULL,
+    [AddressSwe] NVARCHAR(100) NOT NULL,
+    [CityFin] NVARCHAR(50) NOT NULL,
+    [CitySwe] NVARCHAR(50) NOT NULL,
+    [Operator] NVARCHAR(100),
     [Capacity] INT NOT NULL,
     [XCoordinate] DECIMAL(15, 13) NOT NULL,
     [YCoordinate] DECIMAL(15, 13) NOT NULL,
@@ -76,4 +76,33 @@ GRANT SELECT ON [citybike].[Trips_v] TO citybikeapp;
 GO
 
 GRANT SELECT ON [citybike].[Stations_v] TO citybikeapp;
+GO
+
+-- Create temporary tables for importing the data
+-- After importing and inserting validated data to earlier tables these can be dropped
+CREATE TABLE [citybike].[TmpStations]
+(
+    [ID] INT,
+    [Nimi] VARCHAR(100),
+    [Namn] VARCHAR(100),
+    [Name] VARCHAR(100),
+    [Osoite] VARCHAR(100),
+    [Adress] VARCHAR(100),
+    [Kaupunki] VARCHAR(100),
+    [Stad] VARCHAR(100),
+    [Operaattor] VARCHAR(100),
+    [Kapasiteet] INT,
+    [x] DECIMAL(15,13),
+    [y] DECIMAL(15,13)
+);
+GO
+CREATE TABLE [citybike].[TmpTrips]
+(
+    [Departure] DATETIME2,
+    [Return] DATETIME2,
+    [Departure station id] INT,
+    [Return station id] INT,
+    [Covered distance (m)] DECIMAL(12,4),
+    [Duration (sec.)] INT
+);
 GO
