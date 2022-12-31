@@ -158,7 +158,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -175,7 +175,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -192,7 +192,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -209,7 +209,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -226,7 +226,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -243,7 +243,7 @@
 									<Property Name="Length" Value="50" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -260,7 +260,7 @@
 									<Property Name="Length" Value="50" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -276,7 +276,7 @@
 									<Property Name="Length" Value="100" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+											<References ExternalSource="BuiltIns" Name="[varchar]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -507,320 +507,14 @@
 				</Entry>
 			</Relationship>
 			<Annotation Type="SysCommentsObjectAnnotation">
-				<Property Name="Offset" Value="2959" />
+				<Property Name="Offset" Value="3046" />
 				<Property Name="CreateOffset" Value="1" />
 				<Property Name="Length" Value="226" />
-				<Property Name="StartLine" Value="68" />
+				<Property Name="StartLine" Value="69" />
 				<Property Name="StartColumn" Value="1" />
 				<Property Name="HeaderContents" Value="&#xA;CREATE VIEW [citybike].[Stations_v]&#xA;AS" />
 				<Property Name="FooterContents" Value=";" />
 			</Annotation>
-		</Element>
-		<Element Type="SqlTable" Name="[citybike].[TmpStations]">
-			<Property Name="IsAnsiNullsOn" Value="True" />
-			<Relationship Name="Columns">
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[ID]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[int]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Nimi]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Namn]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Name]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Osoite]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Adress]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Kaupunki]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Stad]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Operaattor]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="100" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[Kapasiteet]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[int]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[x]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Scale" Value="13" />
-									<Property Name="Precision" Value="15" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[decimal]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpStations].[y]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Scale" Value="13" />
-									<Property Name="Precision" Value="15" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[decimal]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-			</Relationship>
-			<Relationship Name="Schema">
-				<Entry>
-					<References Name="[citybike]" />
-				</Entry>
-			</Relationship>
-		</Element>
-		<Element Type="SqlTable" Name="[citybike].[TmpTrips]">
-			<Property Name="IsAnsiNullsOn" Value="True" />
-			<Relationship Name="Columns">
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Departure]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Scale" Value="7" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[datetime2]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Return]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Scale" Value="7" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[datetime2]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Departure station id]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[int]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Return station id]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[int]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Covered distance (m)]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Property Name="Scale" Value="4" />
-									<Property Name="Precision" Value="12" />
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[decimal]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[TmpTrips].[Duration (sec.)]">
-						<Relationship Name="TypeSpecifier">
-							<Entry>
-								<Element Type="SqlTypeSpecifier">
-									<Relationship Name="Type">
-										<Entry>
-											<References ExternalSource="BuiltIns" Name="[int]" />
-										</Entry>
-									</Relationship>
-								</Element>
-							</Entry>
-						</Relationship>
-					</Element>
-				</Entry>
-			</Relationship>
-			<Relationship Name="Schema">
-				<Entry>
-					<References Name="[citybike]" />
-				</Entry>
-			</Relationship>
 		</Element>
 		<Element Type="SqlTable" Name="[citybike].[Trips]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -908,7 +602,7 @@
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[Trips].[CoveredDistance]">
+					<Element Type="SqlSimpleColumn" Name="[citybike].[Trips].[CoveredDistanceInMeters]">
 						<Property Name="IsNullable" Value="False" />
 						<Relationship Name="TypeSpecifier">
 							<Entry>
@@ -924,7 +618,7 @@
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[citybike].[Trips].[Duration]">
+					<Element Type="SqlSimpleColumn" Name="[citybike].[Trips].[DurationInSeconds]">
 						<Property Name="IsNullable" Value="False" />
 						<Relationship Name="TypeSpecifier">
 							<Entry>
@@ -952,11 +646,12 @@
 			<Property Name="QueryScript">
 				<Value><![CDATA[
     select t.Id, t.Departure, t.DepartureStationId, sd.NameFin DepartureStationNameFin, sd.NameSwe DepartureStationNameSwe, sd.NameEng DepartureStationNameEng, sd.AddressFin DepartureStationAddressFin,
-    sd.AddressSwe DepartureStationAddressSwe, sd.CityFin DepartureStationCityFin, sd.CitySwe DepartureStationCitySwe, sd.Operator DepartureStationOperator, sd.XCoordinate DepartureStationXCoordinate,
-    sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.[Return], t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
-    sr.NameEng ReturnStationNameEng, sr.AddressFin ReturnStationAddressFin, sr.AddressSwe ReturnStationAddressSwe, sr.CityFin ReturnStationCityFin, sr.CitySwe ReturnStationCitySwe,
-    sr.Operator ReturnStationOperator, sr.XCoordinate ReturnStationXCoordinate, sr.YCoordinate ReturnStationYCoordinate, sr.Capacity ReturnStationCapacity, t.Duration, t.CoveredDistance
-    from [citybike].[Trips] t join [citybike].[Stations] sd on sd.Id = t.DepartureStationId
+        sd.AddressSwe DepartureStationAddressSwe, sd.CityFin DepartureStationCityFin, sd.CitySwe DepartureStationCitySwe, sd.Operator DepartureStationOperator, sd.XCoordinate DepartureStationXCoordinate,
+        sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.[Return], t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
+        sr.NameEng ReturnStationNameEng, sr.AddressFin ReturnStationAddressFin, sr.AddressSwe ReturnStationAddressSwe, sr.CityFin ReturnStationCityFin, sr.CitySwe ReturnStationCitySwe,
+        sr.Operator ReturnStationOperator, sr.XCoordinate ReturnStationXCoordinate, sr.YCoordinate ReturnStationYCoordinate, sr.Capacity ReturnStationCapacity, t.DurationInSeconds, t.CoveredDistanceInMeters
+    from [citybike].[Trips] t
+        join [citybike].[Stations] sd on sd.Id = t.DepartureStationId
         join [citybike].[Stations] sr on sr.Id = t.ReturnStationId]]></Value>
 			</Property>
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -1205,19 +900,19 @@
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlComputedColumn" Name="[citybike].[Trips_v].[Duration]">
+					<Element Type="SqlComputedColumn" Name="[citybike].[Trips_v].[DurationInSeconds]">
 						<Relationship Name="ExpressionDependencies">
 							<Entry>
-								<References Name="[citybike].[Trips].[Duration]" />
+								<References Name="[citybike].[Trips].[DurationInSeconds]" />
 							</Entry>
 						</Relationship>
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlComputedColumn" Name="[citybike].[Trips_v].[CoveredDistance]">
+					<Element Type="SqlComputedColumn" Name="[citybike].[Trips_v].[CoveredDistanceInMeters]">
 						<Relationship Name="ExpressionDependencies">
 							<Entry>
-								<References Name="[citybike].[Trips].[CoveredDistance]" />
+								<References Name="[citybike].[Trips].[CoveredDistanceInMeters]" />
 							</Entry>
 						</Relationship>
 					</Element>
@@ -1318,10 +1013,10 @@
 					<References Name="[citybike].[Stations].[Capacity]" />
 				</Entry>
 				<Entry>
-					<References Name="[citybike].[Trips].[Duration]" />
+					<References Name="[citybike].[Trips].[DurationInSeconds]" />
 				</Entry>
 				<Entry>
-					<References Name="[citybike].[Trips].[CoveredDistance]" />
+					<References Name="[citybike].[Trips].[CoveredDistanceInMeters]" />
 				</Entry>
 			</Relationship>
 			<Relationship Name="Schema">
@@ -1330,9 +1025,9 @@
 				</Entry>
 			</Relationship>
 			<Annotation Type="SysCommentsObjectAnnotation">
-				<Property Name="Offset" Value="1807" />
+				<Property Name="Offset" Value="1853" />
 				<Property Name="CreateOffset" Value="1" />
-				<Property Name="Length" Value="1148" />
+				<Property Name="Length" Value="1189" />
 				<Property Name="StartLine" Value="57" />
 				<Property Name="StartColumn" Value="1" />
 				<Property Name="HeaderContents" Value="&#xA;CREATE VIEW [citybike].[Trips_v]&#xA;AS" />
@@ -1354,7 +1049,7 @@
 					<Annotation Type="PersistedResolvableAnnotation" Name="[citybike]">
 						<Property Name="TargetTypeStorage" Value="SqlSchema" />
 						<Property Name="Length" Value="8" />
-						<Property Name="Offset" Value="271" />
+						<Property Name="Offset" Value="308" />
 					</Annotation>
 				</Entry>
 			</Relationship>

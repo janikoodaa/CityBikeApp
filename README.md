@@ -28,15 +28,11 @@ To follow these instructions, you need to have Docker installed.
       - Using terminal cd to the projects root folder
       - Copy the whole "DataToImport" -directory to the Docker container (created in the previous step) using command `docker cp DataToImport <CONTAINER_ID>:/var/opt`
            - `<CONTAINER_ID>` is the 12-character container-id
-      - The original csv-files are split in half because of the Github's limitations for file size, and included in project files to prevent any conflicts while inserting their data to database.
+      - The original csv-files are included in project files to prevent any conflicts while inserting their data to database. Files are split in half because of the Github's limitations for file size.
 6. Connect to database as server admin (sa) using the password defined earlier
    ![Connect to database](Images/Connect_to_database.png)
-7. Run script in file InsertData.sql
-      - Script will first bulk insert data from csv-files to temporary tables
-      - After that, it inserts data from temporary tables to the actual tables, while validating the data
-           - Stations, which have no city or operator defined, will have city = Helsinki and operator = CityBike Finland
-           - Duplicate trips, and also trips with distance < 10 m and/or duration < 10 s, won't be inserted
-      - Finally the temporary tables will be removed
-        Now the database is ready :+1:
+7. Run script in file InsertData.sql - Script will validate and insert data from csv-files to Stations- and Trips-tables. Explanation on validation is given as comment in [InsertData.sql](DataToImport/InsertData.sql)
+
+Now the database is ready :+1:
 
 ## To run the project

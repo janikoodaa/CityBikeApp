@@ -69,64 +69,56 @@
             COLLATION="" />
     </RECORD>
     <ROW>
+        <COLUMN SOURCE="1"
+            NAME="FID"
+            xsi:type="SQLVARYCHAR" />
+
         <COLUMN SOURCE="2"
             NAME="ID"
-            xsi:type="SQLINT" />
+            xsi:type="SQLVARYCHAR" />
 
         <COLUMN SOURCE="3"
             NAME="Nimi"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="4"
             NAME="Namn"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="5"
             NAME="Name"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="6"
             NAME="Osoite"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="7"
             NAME="Adress"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="8"
             NAME="Kaupunki"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="9"
             NAME="Stad"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="10"
             NAME="Operaattor"
-            xsi:type="SQLVARYCHAR"
-            LENGTH="100" />
+            xsi:type="SQLNVARCHAR" />
 
         <COLUMN SOURCE="11"
             NAME="Kapasiteet"
-            xsi:type="SQLINT" />
+            xsi:type="SQLVARYCHAR" />
 
         <COLUMN SOURCE="12"
             NAME="x"
-            xsi:type="SQLDECIMAL"
-            PRECISION="15"
-            SCALE="13" />
+            xsi:type="SQLVARYCHAR" />
 
         <COLUMN SOURCE="13"
             NAME="y"
-            xsi:type="SQLDECIMAL"
-            PRECISION="15"
-            SCALE="13" />
+            xsi:type="SQLVARYCHAR" />
     </ROW>
 </BCPFORMAT>

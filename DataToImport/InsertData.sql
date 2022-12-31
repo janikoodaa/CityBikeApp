@@ -1,126 +1,128 @@
--- Run this script, which bulk inserts data from csv-files to temporary tables,
--- validates data before inserting it into actual tables, and finally drops the temporary tables.
--- **Note: DataToImport-folder must be copied to Docker-container before running the script**
+/*
+Run this script, which validates and inserts data from csv-files to Stations- and Trips-tables.
+** Note: DataToImport-folder must be copied to Docker-container before running the script **
+Data validation rules:
+- No duplicate rows are inserted
+- In the Stations-data, if no city (fin/swe) is defined, it's assumed to be Helsinki/Helsingfors
+- In the Stations-data, if no operator is defined, it's assumed to be CityBike Finland
+- In the Trips-data, if departure or return date doesn't contain correct date and time, row is not inserted
+- In the Trips-data, departure- and return station ids are checked to be in Stations-data, if not, row is not inserted
+- In the Trips-data, if covered distance < 10 m and/or duration < 10 s, row is not inserted
+*/
 
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-05a.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
+INSERT into citybike.Stations
+    (Id, NameFin, NameSwe, NameEng, AddressFin, AddressSwe, CityFin, CitySwe, Operator, Capacity, XCoordinate, YCoordinate)
+select distinct cast(a.[ID] as int) ID, a.[Nimi], a.[Namn], a.[Name], a.[Osoite], a.[Adress],
+    case when a.[Kaupunki] = ' ' then 'Helsinki' else a.[Kaupunki] end Kaupunki,
+    case when a.[Stad] = ' ' then 'Helsingfors' else a.[Stad] end Stad,
+    case when a.[Operaattor] = ' ' then 'CityBike Finland' else a.[Operaattor] end Operaattor,
+    cast(a.[Kapasiteet] as int) Kapasiteet, cast(a.[x] as decimal(15,13)) x, cast(a.[y] as decimal(15,13)) y
+from openrowset(
+    BULK '\var\opt\DataToImport\Helsingin_ja_Espoon_kaupunkipy%C3%B6r%C3%A4asemat_avoin.csv',
+        formatfile='\var\opt\DataToImport\StationsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+) a
+order by 1;
 GO
 
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-05b.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
-GO
-
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-06a.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
-GO
-
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-06b.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
-GO
-
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-07a.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
-GO
-
-BULK INSERT citybike.TmpTrips
-FROM '\var\opt\DataToImport\2021-07b.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\TripsFormat.xml'
-);
-GO
-
-BULK INSERT citybike.TmpStations
-FROM '\var\opt\DataToImport\Helsingin_ja_Espoon_kaupunkipy%C3%B6r%C3%A4asemat_avoin.csv'
-WITH (
-    firstrow = 2,
-    FORMAT='CSV',
-    fieldquote='"',
-    codepage='RAW',
-    datafiletype='widechar',
-    keepnulls,
-    formatfile='\var\opt\DataToImport\StationsFormat.xml'
-);
-GO
-
--- Insert validated data of stations from temporary table to actual stations-table
-insert into citybike.Stations
-    (id, NameFin, NameSwe, NameEng, AddressFin, AddressSwe, CityFin, CitySwe, Operator, Capacity, XCoordinate, YCoordinate)
-select distinct s.ID, s.nimi, s.namn, s.name, s.osoite, s.adress,
-    case when s.kaupunki = ' ' then 'Helsinki' else s.kaupunki end kaupunki,
-    case when s.stad = ' ' then 'Helsingfors' else s.stad end stad,
-    case when s.operaattor = ' ' then 'CityBike Finland' else s.operaattor end operaattor,
-    s.kapasiteet, s.x, s.y
-from citybike.TmpStations s
-order by s.id asc;
-GO
-
--- Insert validated data of trips from temporary table to actual trips-table
-insert into citybike.Trips
-    (Departure, [Return], DepartureStationId, ReturnStationId, CoveredDistance, Duration)
-select distinct t.Departure, t.[Return], t.[Departure station id], t.[Return station id], t.[Covered distance (m)], t.[Duration (sec.)]
-from citybike.TmpTrips t
-where t.[Covered distance (m)] >= 10
-    and t.[Duration (sec.)] >= 10
-    and t.[Departure station id] in (select distinct id
-    from citybike.Stations)
-    and t.[Return station id] in (select distinct id
-    from citybike.Stations)
-ORDER by t.[Departure] asc, t.[Return] asc;
-GO
-
-DROP TABLE citybike.TmpTrips;
-GO
-
-DROP TABLE citybike.TmpStations;
+INSERT into citybike.Trips
+    (Departure, [Return], DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
+select distinct t.DepartureDate, t.ReturnDate, t.DepartureStationId, t.ReturnStationId, t.CoveredDistance CoveredDistanceInMeters, t.Duration DurationInSeconds
+from (
+                                                                            select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-05a.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+    UNION
+        select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-05b.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+    UNION
+        select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-06a.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+    UNION
+        select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-06b.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+    UNION
+        select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-07a.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+    UNION
+        select
+            case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
+            case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
+            cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+        from openrowset(
+    BULK '\var\opt\DataToImport\2021-07b.csv',
+        formatfile='\var\opt\DataToImport\TripsFormat.xml',
+        firstrow=2,
+        FORMAT='CSV',
+        fieldquote='"',
+        codepage='RAW'
+    ) a
+) t
+where t.DepartureDate is not null
+    and t.ReturnDate is not null
+    and t.CoveredDistance >= 10
+    and t.Duration >= 10
+    and t.DepartureStationId in (select distinct s.Id
+    from citybike.Stations s)
+    and t.ReturnStationId in (select distinct s.Id
+    from citybike.Stations s)
+order by t.DepartureDate asc, t.ReturnDate asc;
 GO

@@ -1,5 +1,5 @@
 -- This script will be executed when the database is built.
--- It creates schema, login/user, needed tables and views.
+-- It creates schema, login/user (limited rights for API application), needed tables and views.
 
 CREATE SCHEMA citybike;
 GO
@@ -18,14 +18,14 @@ GO
 CREATE TABLE [citybike].[Stations]
 (
     [Id] INT NOT NULL PRIMARY KEY,
-    [NameFin] NVARCHAR(100) NOT NULL,
-    [NameSwe] NVARCHAR(100) NOT NULL,
-    [NameEng] NVARCHAR(100) NOT NULL,
-    [AddressFin] NVARCHAR(100) NOT NULL,
-    [AddressSwe] NVARCHAR(100) NOT NULL,
-    [CityFin] NVARCHAR(50) NOT NULL,
-    [CitySwe] NVARCHAR(50) NOT NULL,
-    [Operator] NVARCHAR(100),
+    [NameFin] VARCHAR(100) NOT NULL,
+    [NameSwe] VARCHAR(100) NOT NULL,
+    [NameEng] VARCHAR(100) NOT NULL,
+    [AddressFin] VARCHAR(100) NOT NULL,
+    [AddressSwe] VARCHAR(100) NOT NULL,
+    [CityFin] VARCHAR(50) NOT NULL,
+    [CitySwe] VARCHAR(50) NOT NULL,
+    [Operator] VARCHAR(100),
     [Capacity] INT NOT NULL,
     [XCoordinate] DECIMAL(15, 13) NOT NULL,
     [YCoordinate] DECIMAL(15, 13) NOT NULL,
@@ -42,8 +42,8 @@ CREATE TABLE [citybike].[Trips]
     [Return] DATETIME NOT NULL,
     [DepartureStationId] INT NOT NULL,
     [ReturnStationId] INT NOT NULL,
-    [CoveredDistance] INT NOT NULL,
-    [Duration] INT NOT NULL,
+    [CoveredDistanceInMeters] INT NOT NULL,
+    [DurationInSeconds] INT NOT NULL,
     CONSTRAINT FK_Trips_DepartureStation FOREIGN KEY ([DepartureStationId])
   REFERENCES [citybike].[Stations] ([Id])
   ON DELETE NO ACTION
@@ -58,11 +58,12 @@ GO
 CREATE VIEW [citybike].[Trips_v]
 AS
     select t.Id, t.Departure, t.DepartureStationId, sd.NameFin DepartureStationNameFin, sd.NameSwe DepartureStationNameSwe, sd.NameEng DepartureStationNameEng, sd.AddressFin DepartureStationAddressFin,
-    sd.AddressSwe DepartureStationAddressSwe, sd.CityFin DepartureStationCityFin, sd.CitySwe DepartureStationCitySwe, sd.Operator DepartureStationOperator, sd.XCoordinate DepartureStationXCoordinate,
-    sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.[Return], t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
-    sr.NameEng ReturnStationNameEng, sr.AddressFin ReturnStationAddressFin, sr.AddressSwe ReturnStationAddressSwe, sr.CityFin ReturnStationCityFin, sr.CitySwe ReturnStationCitySwe,
-    sr.Operator ReturnStationOperator, sr.XCoordinate ReturnStationXCoordinate, sr.YCoordinate ReturnStationYCoordinate, sr.Capacity ReturnStationCapacity, t.Duration, t.CoveredDistance
-    from [citybike].[Trips] t join [citybike].[Stations] sd on sd.Id = t.DepartureStationId
+        sd.AddressSwe DepartureStationAddressSwe, sd.CityFin DepartureStationCityFin, sd.CitySwe DepartureStationCitySwe, sd.Operator DepartureStationOperator, sd.XCoordinate DepartureStationXCoordinate,
+        sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.[Return], t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
+        sr.NameEng ReturnStationNameEng, sr.AddressFin ReturnStationAddressFin, sr.AddressSwe ReturnStationAddressSwe, sr.CityFin ReturnStationCityFin, sr.CitySwe ReturnStationCitySwe,
+        sr.Operator ReturnStationOperator, sr.XCoordinate ReturnStationXCoordinate, sr.YCoordinate ReturnStationYCoordinate, sr.Capacity ReturnStationCapacity, t.DurationInSeconds, t.CoveredDistanceInMeters
+    from [citybike].[Trips] t
+        join [citybike].[Stations] sd on sd.Id = t.DepartureStationId
         join [citybike].[Stations] sr on sr.Id = t.ReturnStationId;
 GO
 
@@ -76,33 +77,4 @@ GRANT SELECT ON [citybike].[Trips_v] TO citybikeapp;
 GO
 
 GRANT SELECT ON [citybike].[Stations_v] TO citybikeapp;
-GO
-
--- Create temporary tables for importing the data
--- After importing and inserting validated data to earlier tables these can be dropped
-CREATE TABLE [citybike].[TmpStations]
-(
-    [ID] INT,
-    [Nimi] VARCHAR(100),
-    [Namn] VARCHAR(100),
-    [Name] VARCHAR(100),
-    [Osoite] VARCHAR(100),
-    [Adress] VARCHAR(100),
-    [Kaupunki] VARCHAR(100),
-    [Stad] VARCHAR(100),
-    [Operaattor] VARCHAR(100),
-    [Kapasiteet] INT,
-    [x] DECIMAL(15,13),
-    [y] DECIMAL(15,13)
-);
-GO
-CREATE TABLE [citybike].[TmpTrips]
-(
-    [Departure] DATETIME2,
-    [Return] DATETIME2,
-    [Departure station id] INT,
-    [Return station id] INT,
-    [Covered distance (m)] DECIMAL(12,4),
-    [Duration (sec.)] INT
-);
 GO
