@@ -4,13 +4,14 @@ This project is created to show data of journeys made with Helsinki City Bikes a
 
 ## Tech stack
 
-As a database I'm using Azure SQL Emulator running in Docker.
-Backend is built with .NET 6 and
-client is made with React and styled with Material UI.
+- As a database I'm using Azure SQL Emulator running in Docker, because this offers easy way to build and tear down the database.
+- Backend is built with .NET 6
+- Client is made with React and styled with Material UI.
 
 ## Getting started, build up the database
 
-To follow these instructions, you need to have Docker installed.
+To follow these instructions, you need to have Docker Desktop and Azure Data Studio (or VS Code) installed. See [Microsoft documentation](https://learn.microsoft.com/en-us/azure/azure-sql/database/local-dev-experience-set-up-dev-environment?view=azuresql&tabs=vscode).
+Below steps describe the workflow with Azure Data Studio.
 
 1. Open Azure Data Studio and make sure, you have "SQL Database Projects" -extension installed.
    ![SQL Database Projects -extension](Images/SQL%20Database%20Projects.png)
@@ -31,7 +32,8 @@ To follow these instructions, you need to have Docker installed.
       - The original csv-files are included in project files to prevent any conflicts while inserting their data to database. Files are split in half because of the Github's limitations for file size.
 6. Connect to database as server admin (sa) using the password defined earlier
    ![Connect to database](Images/Connect_to_database.png)
-7. Run script in file InsertData.sql - Script will validate and insert data from csv-files to Stations- and Trips-tables. Explanation on validation is given as comment in [InsertData.sql](DataToImport/InsertData.sql)
+7. Run script in file InsertData.sql
+      - Script will validate and insert data from csv-files to Stations- and Trips-tables. Explanation on validation is given as comment in [InsertData.sql](DataToImport/InsertData.sql)
 
 Now the database is ready :+1:
 
