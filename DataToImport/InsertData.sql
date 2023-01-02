@@ -3,11 +3,13 @@ Run this script, which validates and inserts data from csv-files to Stations- an
 ** Note: DataToImport-folder must be copied to Docker-container before running the script **
 Data validation rules:
 - No duplicate rows are inserted
-- In the Stations-data, if no city (fin/swe) is defined, it's assumed to be Helsinki/Helsingfors
-- In the Stations-data, if no operator is defined, it's assumed to be CityBike Finland
-- In the Trips-data, if departure or return date doesn't contain correct date and time, row is not inserted
-- In the Trips-data, departure- and return station ids are checked to be in Stations-data, if not, row is not inserted
-- In the Trips-data, if covered distance < 10 m and/or duration < 10 s, row is not inserted
+- In the Stations-data, if no city (fin/swe) is defined, it's assumed to be Helsinki/Helsingfors, and added that way.
+- In the Stations-data, if no operator is defined, it's assumed to be CityBike Finland, and added that way.
+- In the Stations-data FID-column is not inserted, as it doesn't seem necessary.
+- In the Trips-data, if departure or return date doesn't contain correct date and time, row is not inserted.
+- In the Trips-data, departure- and return station ids are checked to be in Stations-data, if not, row is not inserted.
+- In the Trips-data, if covered distance < 10 m and/or duration < 10 s, row is not inserted.
+- In the Trips-data the departure- and return station's names are not inserted. Instead, there's foreign key reference to Stations-table by station ids.
 */
 
 INSERT into citybike.Stations
@@ -29,10 +31,10 @@ order by 1;
 GO
 
 INSERT into citybike.Trips
-    (Departure, [Return], DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
+    (DepartureDate, ReturnDate, DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
 select distinct t.DepartureDate, t.ReturnDate, t.DepartureStationId, t.ReturnStationId, t.CoveredDistance CoveredDistanceInMeters, t.Duration DurationInSeconds
 from (
-                                                                            select
+                                                                                                                            select
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,

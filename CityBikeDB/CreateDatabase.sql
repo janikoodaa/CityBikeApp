@@ -38,8 +38,8 @@ GO
 CREATE TABLE [citybike].[Trips]
 (
     [Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    [Departure] DATETIME NOT NULL,
-    [Return] DATETIME NOT NULL,
+    [DepartureDate] DATETIME NOT NULL,
+    [ReturnDate] DATETIME NOT NULL,
     [DepartureStationId] INT NOT NULL,
     [ReturnStationId] INT NOT NULL,
     [CoveredDistanceInMeters] INT NOT NULL,
@@ -57,9 +57,9 @@ GO
 
 CREATE VIEW [citybike].[Trips_v]
 AS
-    select t.Id, t.Departure, t.DepartureStationId, sd.NameFin DepartureStationNameFin, sd.NameSwe DepartureStationNameSwe, sd.NameEng DepartureStationNameEng, sd.AddressFin DepartureStationAddressFin,
+    select t.Id, t.DepartureDate, t.DepartureStationId, sd.NameFin DepartureStationNameFin, sd.NameSwe DepartureStationNameSwe, sd.NameEng DepartureStationNameEng, sd.AddressFin DepartureStationAddressFin,
         sd.AddressSwe DepartureStationAddressSwe, sd.CityFin DepartureStationCityFin, sd.CitySwe DepartureStationCitySwe, sd.Operator DepartureStationOperator, sd.XCoordinate DepartureStationXCoordinate,
-        sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.[Return], t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
+        sd.YCoordinate DepartureStationYCoordinate, sd.Capacity DepartureStationCapacity, t.ReturnDate, t.ReturnStationId, sr.NameFin ReturnStationNameFin, sr.NameSwe ReturnStationNameSwe,
         sr.NameEng ReturnStationNameEng, sr.AddressFin ReturnStationAddressFin, sr.AddressSwe ReturnStationAddressSwe, sr.CityFin ReturnStationCityFin, sr.CitySwe ReturnStationCitySwe,
         sr.Operator ReturnStationOperator, sr.XCoordinate ReturnStationXCoordinate, sr.YCoordinate ReturnStationYCoordinate, sr.Capacity ReturnStationCapacity, t.DurationInSeconds, t.CoveredDistanceInMeters
     from [citybike].[Trips] t
