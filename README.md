@@ -5,7 +5,7 @@ This project is created to show data of journeys made with Helsinki City Bikes a
 ## Tech stack
 
 - As a database I'm using Azure SQL Emulator running in Docker, because this offers easy way to build and tear down the database.
-- Backend is built with .NET 6
+- Backend is built with .NET 7.0
 - Client is made with React and styled with Material UI.
 
 ## Getting started, build up the database
@@ -15,7 +15,7 @@ Below steps describe the workflow with Azure Data Studio.
 
 1. Open Azure Data Studio and make sure, you have "SQL Database Projects" -extension installed.
    ![SQL Database Projects -extension](Images/SQL%20Database%20Projects.png)
-2. In "Database Projects" -tab open existing project "CityBikeDB" which is located in the root of cloned project folder.
+2. In "Database Projects" -tab open existing project "CityBikeDB.sqlproj" which is located in the root of cloned project folder.
 3. Build project and check, that there are no errors.
    ![Build project](Images/build_db-project.png)
 4. Publish project to Docker (creates new container, where the database will be running)
@@ -29,7 +29,7 @@ Below steps describe the workflow with Azure Data Studio.
       - Using terminal cd to the projects root folder
       - Copy the whole "DataToImport" -directory to the Docker container (created in the previous step) using command `docker cp DataToImport <CONTAINER_ID>:/var/opt`
            - `<CONTAINER_ID>` is the 12-character container-id
-      - The original csv-files are included in project files to prevent any conflicts while inserting their data to database. Files are split in half because of the Github's limitations for file size.
+      - The original csv-files (although trip-files split in half because of the Github's limitations for file size) are included in project files to prevent any conflicts while inserting their data to database.
 6. Connect to database as server admin (sa) using the password defined earlier
    ![Connect to database](Images/Connect_to_database.png)
 7. Run script in file InsertData.sql
