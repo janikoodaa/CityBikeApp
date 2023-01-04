@@ -22,7 +22,7 @@ namespace CityBikeAPI.Controllers
         }
 
         // api/stations lists all stations
-        [HttpGet("stations")]
+        [HttpGet("list")]
         public IActionResult GetStationsList([FromQuery] string? name, [FromQuery] string? address, [FromQuery] string? city, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
             if (rowsPerPage < 1 || rowsPerPage > 500 || page < 1)
