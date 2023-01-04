@@ -23,28 +23,28 @@ namespace CityBikeAPI.Controllers
 
         // api/stations lists all stations
         [HttpGet("stations")]
-        public IActionResult GetStationsList([FromQuery] string? name, [FromQuery] string? address, [FromQuery] string? city, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromQuery] string language)
+        public IActionResult GetStationsList([FromQuery] string? name, [FromQuery] string? address, [FromQuery] string? city, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
-            if (rowsPerPage < 1 || page < 1 || language == null)
+            if (rowsPerPage < 1 || rowsPerPage > 500 || page < 1)
             {
-                return StatusCode(400, "Required query parameters are rowsPerPage, page and language.");
+                return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 1).");
             }
 
             List<Station> stations = new();
 
             try
             {
-                stations = _repository.GetStations(name, address, city, sortBy, sortDir, rowsPerPage, page, language);
-                if (stations.Count() == 0)
+                stations = _repository.GetStations(name, address, city, sortBy, sortDir, rowsPerPage, page, clientLanguage);
+                if (stations.Count == 0)
                 {
-                    return NotFound();
+                    return StatusCode(404, stations);
                 }
-                else return Ok(stations);
+                else return StatusCode(200, stations);
             }
             catch (Exception ex)
             {
                 string timestamp = DateTime.Now.ToString("O");
-                _logger.LogError($"{timestamp}, Exception message: {ex.Message}\n{timestamp}, StackTrace: {ex.StackTrace}\n{timestamp}, Arguments: [name: {name}, address: {address}, city: {city}, rowsPerPage: {rowsPerPage}, page: {page}, language: {language}].");
+                _logger.LogError($"{timestamp}, Exception message: {ex.Message}\n{timestamp}, StackTrace: {ex.StackTrace}\n{timestamp}, Arguments: [name: {name}, address: {address}, city: {city}, sortBy: {sortBy}, sortDir: {sortDir}, rowsPerPage: {rowsPerPage}, page: {page}, clientLanguage: {clientLanguage}].");
                 return StatusCode(500);
             }
         }
