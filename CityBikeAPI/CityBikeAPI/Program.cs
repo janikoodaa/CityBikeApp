@@ -1,14 +1,8 @@
 ﻿using CityBikeAPI.Data;
-//using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-//builder.Services.AddDbContext<CityBikeContext>(options =>
-//{
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("CityBikeDB"));
-//});
 
 builder.Services.AddScoped<ICityBikeRepository, SqlServerCityBikeRepo>();
 
