@@ -40,6 +40,12 @@ export function useLanguageContext() {
 }
 
 export function LanguageProvider({ children }) {
-     const [language, setLanguage] = useState(languages.fin.value);
+     const [language, setState] = useState(sessionStorage.getItem("citybikelanguage") || languages.fin.value);
+
+     const setLanguage = (lang) => {
+          setState(lang);
+          sessionStorage.setItem("citybikelanguage", lang);
+     };
+
      return <LanguageContext.Provider value={{ language, setLanguage }}>{children}</LanguageContext.Provider>;
 }
