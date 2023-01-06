@@ -1,4 +1,3 @@
-import { useRouteError } from "react-router-dom";
 import { useLanguageContext } from "./context/languageContext";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -11,14 +10,13 @@ const translations = {
           eng: "Oops...",
      },
      explanation: {
-          fin: "Tapahtui virhe. Alla lisätietoa englanniksi.",
-          swe: "Ett misstag hänt. Mer info nedanför i engelska.",
-          eng: "An error occured. See more info below.",
+          fin: "Tätä sivua ei ole olemassa.",
+          swe: "Den här sidan är inte existenrande.",
+          eng: "This page doesn't exist.",
      },
 };
 
-export default function ErrorPage() {
-     const error = useRouteError();
+export default function NotFoundPage() {
      const { language } = useLanguageContext();
 
      return (
@@ -35,7 +33,6 @@ export default function ErrorPage() {
                          {translations.head[language]}
                     </Typography>
                     <Typography paragraph>{translations.explanation[language]}</Typography>
-                    <Typography paragraph>{error.statusText || error.message}</Typography>
                </Paper>
           </Container>
      );
