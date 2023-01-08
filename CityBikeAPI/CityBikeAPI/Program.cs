@@ -6,14 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<ICityBikeRepository, SqlServerCityBikeRepo>();
 
+string myCorsPolicy = "_myAllowedOrigins";
 builder.Services.AddCors(options =>
 {
     string allowedOrigin = builder.Configuration.GetValue("AllowedOrigin", "")!;
-    options.AddPolicy(name: "_myAllowedOrigins",
+    options.AddPolicy(name: myCorsPolicy,
         builder =>
         {
             builder.WithOrigins(allowedOrigin)
-            .WithMethods("GET")
+            .WithMethods("GET", "OPTIONS")
             .AllowAnyHeader();
         });
 });
@@ -34,6 +35,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(myCorsPolicy);
 
 app.UseHttpsRedirection();
 
