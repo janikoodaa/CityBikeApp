@@ -45,7 +45,7 @@ Now the database is ready :+1:
 ## To run the project
 
 1. Make sure the Docker container, where you have the database, is running.
-2. To start API-application, open [CityBikeAPI.sln](CityBikeAPI/CityBikeAPI.sln) in Visual Studio, and start the solution. **Note, that in this case the [appsettings.Development.json](CityBikeAPI/CityBikeAPI/appsettings.Development.json) is included in this repository, even it holds the database connectionstring, so everything is ready. This is because this project includes creation of the test database and the application user is thus public anyway.**
+2. To start API-application, open [CityBikeAPI.sln](CityBikeAPI/CityBikeAPI.sln) in Visual Studio, and start the solution. **_Note, that in this case the [appsettings.Development.json](CityBikeAPI/CityBikeAPI/appsettings.Development.json) is included in this repository, even it holds the database connectionstring, so everything is ready. This is because this project includes creation of the test database and the application user is thus public anyway._**
 3. To start client application, use terminal and cd to folder [citybike-client](citybike-client), located in the projects root.
 4. Install dependencies with command `npm install`.
 5. Start dev server with command `npm run dev`.

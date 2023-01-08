@@ -125,7 +125,7 @@ namespace CityBikeAPI.Data
                             }
                             // Pagination
                             query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
-                            cmd2.Parameters.Add("Offset", SqlDbType.Int).Value = (page - 1) * rowsPerPage;
+                            cmd2.Parameters.Add("Offset", SqlDbType.Int).Value = page * rowsPerPage;
                             cmd2.Parameters.Add("RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
                             // Assign complete query string to CommandText
                             cmd2.CommandText = query;
@@ -152,8 +152,8 @@ namespace CityBikeAPI.Data
                                         reader.GetDecimal(reader.GetOrdinal("YCoordinate"))
                                         ));
                                 }
-                                data.RowsFrom = (page - 1) * rowsPerPage + 1;
-                                data.RowsTo = (page - 1) * rowsPerPage + data.Stations.Count;
+                                data.RowsFrom = page * rowsPerPage + 1;
+                                data.RowsTo = page * rowsPerPage + data.Stations.Count;
                             }
                             reader.Close();
                             connection.Close();

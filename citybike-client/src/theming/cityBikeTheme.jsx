@@ -1,5 +1,17 @@
 import { createTheme } from "@mui/material/styles";
 import { yellow, grey } from "@mui/material/colors";
+import { fiFI, svSE } from "@mui/x-data-grid";
+
+// const getDataGridLocale = () => {
+//      switch (sessionStorage.getItem("citybikelanguage")) {
+//           case "fin":
+//                return fiFI;
+//           case "swe":
+//                return svSE;
+//           default:
+//                return null;
+//      }
+// };
 
 export const theme = createTheme({
      palette: {
@@ -52,3 +64,7 @@ export const theme = createTheme({
           },
      },
 });
+
+export const gridLocaleFin = createTheme(fiFI);
+export const gridLocaleSwe = createTheme(svSE);
+export const gridLocaleEng = createTheme();

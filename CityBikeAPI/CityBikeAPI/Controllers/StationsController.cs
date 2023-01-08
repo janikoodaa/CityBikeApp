@@ -25,9 +25,9 @@ namespace CityBikeAPI.Controllers
         [HttpGet("list")]
         public IActionResult GetStationsList([FromQuery] string? name, [FromQuery] string? address, [FromQuery] string? city, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
-            if (rowsPerPage < 1 || rowsPerPage > 500 || page < 1)
+            if (rowsPerPage < 1 || rowsPerPage > 500 || page < 0)
             {
-                return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 1).");
+                return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 0).");
             }
 
             PaginatedStations stations = new();

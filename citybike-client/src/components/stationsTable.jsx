@@ -1,3 +1,4 @@
+import { useState, useReducer, useEffect, useCallback } from "react";
 import { useLanguageContext } from "../context/languageContext";
 import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
@@ -32,6 +33,55 @@ const translations = {
      },
 };
 
+const emptyData = {
+     rowsFrom: 0,
+     rowsTo: 0,
+     totalRowCount: 0,
+     stations: [],
+};
+
+const initialQueryParams = {
+     name: "",
+     address: "",
+     city: "",
+     sortBy: "name",
+     sortDir: "asc",
+     rowsPerPage: 100,
+     page: 0,
+};
+
+const ACTION_TYPES = Object.freeze({
+     UPDATE_FILTER_MODEL: 1,
+     UPDATE_SORT_MODEL: 2,
+     UPDATE_ROWS_PER_PAGE: 3,
+     UPDATE_PAGE: 4,
+});
+
+function updateQueryParams(queryParams, action) {
+     switch (action.type) {
+          case ACTION_TYPES.UPDATE_FILTER_MODEL: {
+               switch (action.payload.field) {
+                    case "name":
+                         return { ...queryParams, name: action.payload.value, address: "", city: "" };
+                    case "address":
+                         return { ...queryParams, name: "", address: action.payload.value, city: "" };
+                    case "city":
+                         return { ...queryParams, name: "", address: "", city: action.payload.value };
+                    default:
+                         return { ...queryParams };
+               }
+          }
+          case ACTION_TYPES.UPDATE_SORT_MODEL:
+               return { ...queryParams, sortBy: action.payload.field, sortDir: action.payload.sort };
+          case ACTION_TYPES.UPDATE_ROWS_PER_PAGE:
+               return { ...queryParams, rowsPerPage: action.payload.newPageSize, page: action.payload.newPage };
+          case ACTION_TYPES.UPDATE_PAGE:
+               return { ...queryParams, page: action.payload };
+          default:
+               return { ...queryParams };
+     }
+}
+
 const stationNameCol = (language) => {
      switch (language) {
           case "swe":
@@ -53,18 +103,20 @@ const stationCityCol = (language) => {
      return "cityFin";
 };
 
-const InfoButton = (props) => {
-     const { value } = props;
-     return (
-          <IconButton onClick={() => console.log(value)}>
-               <InfoOutlinedIcon />
-          </IconButton>
-     );
-};
-
-export default function StationsTable(props) {
-     const { stations, setStations, queryParams, dispatchQueryParams, ACTION_TYPES } = props;
+export default function StationsTable() {
      const { language } = useLanguageContext();
+     const [stations, setStations] = useState(emptyData);
+     const [queryParams, dispatchQueryParams] = useReducer(updateQueryParams, initialQueryParams);
+     const [loadingData, setLoadingData] = useState(false);
+
+     const InfoButton = (props) => {
+          const { value } = props;
+          return (
+               <IconButton onClick={() => console.log(value)}>
+                    <InfoOutlinedIcon />
+               </IconButton>
+          );
+     };
 
      const dataGridColumns = [
           { field: stationNameCol(language), headerName: translations.stationName[language], width: 200, hideable: false },
@@ -83,6 +135,61 @@ export default function StationsTable(props) {
           },
      ];
 
+     const handleSortModelChange = useCallback((sortModel) => {
+          dispatchQueryParams({ type: ACTION_TYPES.UPDATE_SORT_MODEL, payload: { field: sortModel.field, sort: sortModel.sort } });
+     });
+
+     const handleFilterModelChange = useCallback((filterModel) => {
+          let field = filterModel.items[0]?.columnField.substring(0, filterModel.items[0].columnField.length - 3);
+          let value = filterModel.items[0].value || "";
+          dispatchQueryParams({
+               type: ACTION_TYPES.UPDATE_FILTER_MODEL,
+               payload: { field: field, value: value },
+          });
+     });
+
+     const handlePageChange = useCallback((newPage) => {
+          dispatchQueryParams({ type: ACTION_TYPES.UPDATE_PAGE, payload: newPage });
+     });
+
+     const handlePageSizeChange = useCallback((newPageSize) => {
+          let newPage = (stations.rowsFrom / newPageSize).toFixed(0);
+          dispatchQueryParams({ type: ACTION_TYPES.UPDATE_ROWS_PER_PAGE, payload: { newPageSize: newPageSize, newPage: newPage } });
+     });
+
+     useEffect(() => {
+          setLoadingData(true);
+
+          const controller = new AbortController();
+          const signal = controller.signal;
+          const apiUrl = "https://localhost:7279/api/";
+          let endpoint = `${apiUrl}stations/list?name=${queryParams.name}&address=${queryParams.address}&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}&rowsperpage=${queryParams.rowsPerPage}&page=${queryParams.page}`;
+          let headers = { clientLanguage: language };
+
+          const getData = async () => {
+               try {
+                    let response = await fetch(endpoint, {
+                         method: "GET",
+                         headers: headers,
+                         mode: "cors",
+                         signal: signal,
+                    });
+                    let data = await response.json();
+                    setStations(data);
+               } catch (error) {
+                    if (error.name !== "AbortError") {
+                         console.log("Error: ", error);
+                         setStations(emptyData);
+                    }
+               }
+          };
+          getData();
+          setLoadingData(false);
+          return () => {
+               controller.abort();
+          };
+     }, [queryParams]);
+
      return (
           <Container
                maxWidth="lg"
@@ -90,10 +197,20 @@ export default function StationsTable(props) {
           >
                <DataGrid
                     columns={dataGridColumns}
-                    rows={stations}
+                    rows={stations.stations}
                     rowHeight={60}
-                    page={queryParams.page - 1}
-                    rowCount={stations?.length}
+                    loading={loadingData}
+                    page={parseInt(queryParams.page)}
+                    rowCount={stations.totalRowCount}
+                    rowsPerPageOptions={[50, 100]}
+                    sortingMode="server"
+                    onSortModelChange={handleSortModelChange}
+                    filterMode="server"
+                    onFilterModelChange={handleFilterModelChange}
+                    paginationMode="server"
+                    onPageChange={(newPage) => handlePageChange(newPage)}
+                    pageSize={queryParams.rowsPerPage}
+                    onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
                     sx={{ backgroundColor: "white" }}
                />
           </Container>
