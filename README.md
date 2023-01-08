@@ -4,9 +4,9 @@ This project is created to show data of journeys made with Helsinki City Bikes a
 
 ## Tech stack
 
-- As a database I'm using Azure SQL Emulator running in Docker, because this offers easy way to build and tear down the database.
-- Backend is built with .NET 7.0
-- Client is made with React and styled with Material UI.
+-    As a database I'm using Azure SQL Emulator running in Docker, because this offers easy way to build and tear down the database as needed.
+-    Backend is built with .NET 7.0 in C#
+-    Client is made with React and styled with Material UI in Javascript.
 
 ## Getting started, build up the database
 
@@ -19,22 +19,38 @@ Below steps describe the workflow with Azure Data Studio.
 3. Build project and check, that there are no errors.
    ![Build project](Images/build_db-project.png)
 4. Publish project to Docker (creates new container, where the database will be running)
-      - Choose "Publish to new Azure SQL server local development container".
-      - Use default port 1433
-      - Define server admin password (later you need to connect to database for inserting data, so remember the password)
-      - Choose "Azure SQL Database emulator Lite" as Docker image
-      - Make sure, that the database name is "CityBikeDB"
-        ![Publish project](Images/publish_db-project.png)
+     - Choose "Publish to new Azure SQL server local development container".
+     - Use default port 1433
+     - Define server admin password (later you need to connect to database for inserting data, so remember the password)
+     - Choose "Azure SQL Database emulator Lite" as Docker image
+     - Make sure, that the database name is "CityBikeDB"
+       ![Publish project](Images/publish_db-project.png)
 5. Copy source data files to Docker container
-      - Using terminal cd to the projects root folder
-      - Copy the whole "DataToImport" -directory to the Docker container (created in the previous step) using command `docker cp DataToImport <CONTAINER_ID>:/var/opt`
-           - `<CONTAINER_ID>` is the 12-character container-id
-      - The original csv-files (although trip-files split in half because of the Github's limitations for file size) are included in project files to prevent any conflicts while inserting their data to database.
+     - Using terminal cd to the projects root folder
+     - Copy the whole "DataToImport" -directory to the Docker container (created in the previous step) using command `docker cp DataToImport <CONTAINER_ID>:/var/opt`
+          - `<CONTAINER_ID>` is the 12-character container-id
+     - The original csv-files (although trip-files split in half because of the Github's limitations for file size) are included in project files to prevent any conflicts while inserting their data to database.
 6. Connect to database as server admin (sa) using the password defined earlier
    ![Connect to database](Images/Connect_to_database.png)
-7. Run script in file InsertData.sql
-      - Script will validate and insert data from csv-files to Stations- and Trips-tables. Explanation on validation is given as comment in [InsertData.sql](DataToImport/InsertData.sql)
+7. Run script in file [InsertData.sql](DataToImport/InsertData.sql)
+     - Script will validate and insert data from csv-files to Stations- and Trips-tables. Explanation on validation is given as comment in [InsertData.sql](DataToImport/InsertData.sql)
 
 Now the database is ready :+1:
 
+## Getting started, runtimes
+
+1. For backend you need to have [.NET 7.0 runtime](https://dotnet.microsoft.com/download/dotnet) installed.
+2. For client you need to have [Node.js runtime](https://nodejs.org/en/) installed. Preferred version is ^18.12.1.
+
 ## To run the project
+
+1. Make sure the Docker container, where you have the database, is running.
+2. To start API-application, open [CityBikeAPI.sln](CityBikeAPI/CityBikeAPI.sln) in Visual Studio, and start the solution. **Note, that in this case the [appsettings.Development.json](CityBikeAPI/CityBikeAPI/appsettings.Development.json) is included in this repository, even it holds the database connectionstring, so everything is ready. This is because this project includes creation of the test database and the application user is thus public anyway.**
+3. To start client application, use terminal and cd to folder [citybike-client](citybike-client), located in the projects root.
+4. Install dependencies with command `npm install`.
+5. Start dev server with command `npm run dev`.
+
+## Something about the client application
+
+-    App is built responsive, so give it a try, and test different window sizes.
+-    App supports three languages, and the language selection is stored in session storage.
