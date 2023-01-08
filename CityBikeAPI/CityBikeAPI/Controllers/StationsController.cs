@@ -30,12 +30,12 @@ namespace CityBikeAPI.Controllers
                 return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 1).");
             }
 
-            List<Station> stations = new();
+            PaginatedStations stations = new();
 
             try
             {
                 stations = _repository.GetStations(name, address, city, sortBy, sortDir, rowsPerPage, page, clientLanguage);
-                if (stations.Count == 0)
+                if (stations.Stations.Count == 0)
                 {
                     return StatusCode(404, stations);
                 }

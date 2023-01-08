@@ -17,100 +17,151 @@ namespace CityBikeAPI.Data
             _configuration = configuration;
         }
 
-        public List<Station> GetStations(string? name, string? address, string? city, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
+        public PaginatedStations GetStations(string? name, string? address, string? city, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
         {
-            List<Station> stations = new();
+            PaginatedStations data = new();
             try
             {
                 using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("CityBikeDB")))
                 {
-                    using (SqlCommand cmd = new SqlCommand())
+                    using (SqlCommand cmd1 = new SqlCommand())
                     {
-                        cmd.Connection = connection;
-                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd1.Connection = connection;
+                        cmd1.CommandType = System.Data.CommandType.Text;
 
                         // Build query string depending on the incoming parameteres
-                        string query = @"select s.Id, s.NameFin, s.NameSwe, s.NameEng, s.AddressFin, s.AddressSwe, s.CityFin, s.CitySwe, s.Operator, s.Capacity, s.XCoordinate, s.YCoordinate "
-                                       + " from citybike.stations_v s where 1 = 1 ";
-                        // Search conditions
+                        string query = @"select count(1) from citybike.stations_v s where 1 = 1 ";
                         if (name != null)
                         {
                             if (clientLanguage.ToLower() == "fin") query += " and lower(s.NameFin) like @Name ";
                             if (clientLanguage.ToLower() == "swe") query += " and lower(s.NameSwe) like @Name ";
                             if (clientLanguage.ToLower() == "eng") query += " and lower(s.NameEng) like @Name ";
-                            cmd.Parameters.Add("Name", SqlDbType.NVarChar).Value = $"%{name.ToLower()}%";
+                            cmd1.Parameters.Add("Name", SqlDbType.NVarChar).Value = $"%{name.ToLower()}%";
                         }
                         if (address != null)
                         {
                             if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " and lower(s.AddressFin) like @Address ";
                             if (clientLanguage.ToLower() == "swe") query += " and lower(s.AddressSwe) like @Address ";
-                            cmd.Parameters.Add("Address", SqlDbType.NVarChar).Value = $"%{address.ToLower()}%";
+                            cmd1.Parameters.Add("Address", SqlDbType.NVarChar).Value = $"%{address.ToLower()}%";
                         }
                         if (city != null)
                         {
                             if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " and lower(s.CityFin) like @City ";
                             if (clientLanguage.ToLower() == "swe") query += " and lower(s.CitySwe) like @City ";
-                            cmd.Parameters.Add("City", SqlDbType.NVarChar).Value = $"%{city.ToLower()}%";
+                            cmd1.Parameters.Add("City", SqlDbType.NVarChar).Value = $"%{city.ToLower()}%";
                         }
-                        // Order by
-                        query += " order by ";
-                        if (sortBy?.ToLower() == "address")
-                        {
-                            if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " s.AddressFin ";
-                            if (clientLanguage.ToLower() == "swe") query += " s.AddressSwe ";
-                        }
-                        else if (sortBy?.ToLower() == "city")
-                        {
-                            if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " s.CityFin ";
-                            if (clientLanguage.ToLower() == "swe") query += " s.CitySwe ";
-                        }
-                        else
-                        {
-                            if (clientLanguage.ToLower() == "fin") query += " s.NameFin ";
-                            if (clientLanguage.ToLower() == "swe") query += " s.NameSwe ";
-                            if (clientLanguage.ToLower() == "eng") query += " s.NameEng ";
-                        }
-                        // Order direction
-                        if (sortDir?.ToLower() == "asc")
-                        {
-                            query += " asc ";
-                        }
-                        else
-                        {
-                            query += " desc ";
-                        }
-                        // Pagination
-                        query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
-                        cmd.Parameters.Add("Offset", SqlDbType.Int).Value = (page - 1) * rowsPerPage;
-                        cmd.Parameters.Add("RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
                         // Assign complete query string to CommandText
-                        cmd.CommandText = query;
+                        cmd1.CommandText = query;
 
                         connection.Open();
-                        SqlDataReader reader = cmd.ExecuteReader();
+                        SqlDataReader reader = cmd1.ExecuteReader();
 
-                        while (reader.Read())
+                        if (reader.HasRows)
                         {
-                            stations.Add(new Station(
-                                reader.GetInt32(reader.GetOrdinal("Id")),
-                                reader.GetString(reader.GetOrdinal("NameFin")),
-                                reader.GetString(reader.GetOrdinal("NameSwe")),
-                                reader.GetString(reader.GetOrdinal("NameEng")),
-                                reader.GetString(reader.GetOrdinal("AddressFin")),
-                                reader.GetString(reader.GetOrdinal("AddressSwe")),
-                                reader.GetString(reader.GetOrdinal("CityFin")),
-                                reader.GetString(reader.GetOrdinal("CitySwe")),
-                                reader.GetString(reader.GetOrdinal("Operator")),
-                                reader.GetInt32(reader.GetOrdinal("Capacity")),
-                                reader.GetDecimal(reader.GetOrdinal("XCoordinate")),
-                                reader.GetDecimal(reader.GetOrdinal("YCoordinate"))
-                                ));
+                            while (reader.Read())
+                            {
+                                data.TotalRowCount = reader.GetInt32(0);
+                            }
                         }
                         reader.Close();
                         connection.Close();
                     }
+                    if (data.TotalRowCount > 0)
+                    {
+                        using (SqlCommand cmd2 = new SqlCommand())
+                        {
+                            cmd2.Connection = connection;
+                            cmd2.CommandType = System.Data.CommandType.Text;
+
+                            // Build query string depending on the incoming parameteres
+                            string query = @"select s.Id, s.NameFin, s.NameSwe, s.NameEng, s.AddressFin, s.AddressSwe, s.CityFin, s.CitySwe, s.Operator, s.Capacity, s.XCoordinate, s.YCoordinate "
+                                           + " from citybike.stations_v s where 1 = 1 ";
+                            // Search conditions
+                            if (name != null)
+                            {
+                                if (clientLanguage.ToLower() == "fin") query += " and lower(s.NameFin) like @Name ";
+                                if (clientLanguage.ToLower() == "swe") query += " and lower(s.NameSwe) like @Name ";
+                                if (clientLanguage.ToLower() == "eng") query += " and lower(s.NameEng) like @Name ";
+                                cmd2.Parameters.Add("Name", SqlDbType.NVarChar).Value = $"%{name.ToLower()}%";
+                            }
+                            if (address != null)
+                            {
+                                if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " and lower(s.AddressFin) like @Address ";
+                                if (clientLanguage.ToLower() == "swe") query += " and lower(s.AddressSwe) like @Address ";
+                                cmd2.Parameters.Add("Address", SqlDbType.NVarChar).Value = $"%{address.ToLower()}%";
+                            }
+                            if (city != null)
+                            {
+                                if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " and lower(s.CityFin) like @City ";
+                                if (clientLanguage.ToLower() == "swe") query += " and lower(s.CitySwe) like @City ";
+                                cmd2.Parameters.Add("City", SqlDbType.NVarChar).Value = $"%{city.ToLower()}%";
+                            }
+                            // Order by
+                            query += " order by ";
+                            if (sortBy?.ToLower() == "address")
+                            {
+                                if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " s.AddressFin ";
+                                if (clientLanguage.ToLower() == "swe") query += " s.AddressSwe ";
+                            }
+                            else if (sortBy?.ToLower() == "city")
+                            {
+                                if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " s.CityFin ";
+                                if (clientLanguage.ToLower() == "swe") query += " s.CitySwe ";
+                            }
+                            else
+                            {
+                                if (clientLanguage.ToLower() == "fin") query += " s.NameFin ";
+                                if (clientLanguage.ToLower() == "swe") query += " s.NameSwe ";
+                                if (clientLanguage.ToLower() == "eng") query += " s.NameEng ";
+                            }
+                            // Order direction
+                            if (sortDir?.ToLower() == "asc")
+                            {
+                                query += " asc ";
+                            }
+                            else
+                            {
+                                query += " desc ";
+                            }
+                            // Pagination
+                            query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
+                            cmd2.Parameters.Add("Offset", SqlDbType.Int).Value = (page - 1) * rowsPerPage;
+                            cmd2.Parameters.Add("RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
+                            // Assign complete query string to CommandText
+                            cmd2.CommandText = query;
+
+                            connection.Open();
+                            SqlDataReader reader = cmd2.ExecuteReader();
+
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    data.Stations.Add(new Station(
+                                        reader.GetInt32(reader.GetOrdinal("Id")),
+                                        reader.GetString(reader.GetOrdinal("NameFin")),
+                                        reader.GetString(reader.GetOrdinal("NameSwe")),
+                                        reader.GetString(reader.GetOrdinal("NameEng")),
+                                        reader.GetString(reader.GetOrdinal("AddressFin")),
+                                        reader.GetString(reader.GetOrdinal("AddressSwe")),
+                                        reader.GetString(reader.GetOrdinal("CityFin")),
+                                        reader.GetString(reader.GetOrdinal("CitySwe")),
+                                        reader.GetString(reader.GetOrdinal("Operator")),
+                                        reader.GetInt32(reader.GetOrdinal("Capacity")),
+                                        reader.GetDecimal(reader.GetOrdinal("XCoordinate")),
+                                        reader.GetDecimal(reader.GetOrdinal("YCoordinate"))
+                                        ));
+                                }
+                                data.RowsFrom = (page - 1) * rowsPerPage + 1;
+                                data.RowsTo = (page - 1) * rowsPerPage + data.Stations.Count;
+                            }
+                            reader.Close();
+                            connection.Close();
+                        }
+                    }
                 }
-                return stations;
+
+                return data;
             }
             catch
             {
