@@ -1,6 +1,5 @@
 import { useLanguageContext } from "../context/languageContext";
-import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
+import InfoContainer from "../components/infoContainer";
 import Typography from "@mui/material/Typography";
 
 const translations = {
@@ -25,21 +24,16 @@ export default function Home() {
      const { language } = useLanguageContext();
 
      return (
-          <Container
-               maxWidth="lg"
-               sx={{ display: "flex", justifyContent: "center" }}
-          >
-               <Paper sx={{ width: "80%", textAlign: "center" }}>
-                    <Typography
-                         variant="h1"
-                         fontFamily={"monospace"}
-                         letterSpacing=".25rem"
-                    >
-                         {translations.welcome[language]}
-                    </Typography>
-                    <Typography paragraph>{translations.content1[language]}</Typography>
-                    <Typography paragraph>{translations.content2[language]}</Typography>
-               </Paper>
-          </Container>
+          <InfoContainer>
+               <Typography
+                    variant="h1"
+                    fontFamily={"monospace"}
+                    letterSpacing=".25rem"
+               >
+                    {translations.welcome[language]}
+               </Typography>
+               <Typography paragraph>{translations.content1[language]}</Typography>
+               <Typography paragraph>{translations.content2[language]}</Typography>
+          </InfoContainer>
      );
 }

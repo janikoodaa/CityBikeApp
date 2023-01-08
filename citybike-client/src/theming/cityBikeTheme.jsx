@@ -41,5 +41,14 @@ export const theme = createTheme({
                     },
                },
           },
+          MuiPaper: {
+               styleOverrides: {
+                    root: {
+                         "&.info-content": {
+                              textAlign: "center",
+                         },
+                    },
+               },
+          },
      },
 });
