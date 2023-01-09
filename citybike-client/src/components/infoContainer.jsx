@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 export default function InfoContainer({ children }) {
      return (
           <Container
-               maxWidth="lg"
+               maxWidth="xl"
                sx={{ display: "flex", justifyContent: "center" }}
           >
                <Paper

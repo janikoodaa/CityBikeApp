@@ -4,6 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import StationsFilter from "./stationsFilter";
 
 const translations = {
      stationName: {
@@ -60,16 +61,7 @@ const ACTION_TYPES = Object.freeze({
 function updateQueryParams(queryParams, action) {
      switch (action.type) {
           case ACTION_TYPES.UPDATE_FILTER_MODEL: {
-               switch (action.payload.field) {
-                    case "name":
-                         return { ...queryParams, name: action.payload.value, address: "", city: "" };
-                    case "address":
-                         return { ...queryParams, name: "", address: action.payload.value, city: "" };
-                    case "city":
-                         return { ...queryParams, name: "", address: "", city: action.payload.value };
-                    default:
-                         return { ...queryParams };
-               }
+               return { ...queryParams, name: action.payload.name, address: action.payload.address, city: action.payload.city };
           }
           case ACTION_TYPES.UPDATE_SORT_MODEL:
                return { ...queryParams, sortBy: action.payload.field, sortDir: action.payload.sort };
@@ -137,7 +129,6 @@ export default function StationsTable() {
      ];
 
      const handleSortModelChange = useCallback((sortModel) => {
-          console.log(sortModel);
           let sortField = sortModel[0].field;
           if (sortField.endsWith("Fin") || sortField.endsWith("Swe") || sortField.endsWith("Eng")) {
                sortField = sortField.substring(0, sortField.length - 3);
@@ -188,28 +179,35 @@ export default function StationsTable() {
      }, [queryParams]);
 
      return (
-          <Container
-               maxWidth="lg"
-               sx={{ display: "flex", justifyContent: "center", height: 500, width: { xs: "100%", md: "80%" }, marginTop: "1em" }}
-          >
-               <DataGrid
-                    columns={dataGridColumns}
-                    rows={stations.stations}
-                    rowHeight={60}
-                    loading={loadingData}
-                    page={parseInt(queryParams.page)}
-                    rowCount={stations.totalRowCount}
-                    rowsPerPageOptions={[50, 100]}
-                    sortingMode="server"
-                    onSortModelChange={handleSortModelChange}
-                    paginationMode="server"
-                    onPageChange={(newPage) => handlePageChange(newPage)}
-                    pageSize={queryParams.rowsPerPage}
-                    onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
-                    disableSelectionOnClick
-                    disableColumnMenu
-                    sx={{ backgroundColor: "white" }}
+          <>
+               <StationsFilter
+                    queryParams={queryParams}
+                    dispatchQueryParams={dispatchQueryParams}
+                    ACTION_TYPES={ACTION_TYPES}
                />
-          </Container>
+               <Container
+                    maxWidth="xl"
+                    sx={{ display: "flex", justifyContent: "center", height: 500, width: { xs: "100%", md: "80%" } }}
+               >
+                    <DataGrid
+                         columns={dataGridColumns}
+                         rows={stations.stations}
+                         rowHeight={60}
+                         loading={loadingData}
+                         page={parseInt(queryParams.page)}
+                         rowCount={stations.totalRowCount}
+                         rowsPerPageOptions={[50, 100]}
+                         sortingMode="server"
+                         onSortModelChange={handleSortModelChange}
+                         paginationMode="server"
+                         onPageChange={(newPage) => handlePageChange(newPage)}
+                         pageSize={queryParams.rowsPerPage}
+                         onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
+                         disableSelectionOnClick
+                         disableColumnMenu
+                         sx={{ backgroundColor: "white" }}
+                    />
+               </Container>
+          </>
      );
 }
