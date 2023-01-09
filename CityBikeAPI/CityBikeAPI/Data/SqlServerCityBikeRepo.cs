@@ -108,6 +108,10 @@ namespace CityBikeAPI.Data
                                 if (clientLanguage.ToLower() == "fin" || clientLanguage.ToLower() == "eng") query += " s.CityFin ";
                                 if (clientLanguage.ToLower() == "swe") query += " s.CitySwe ";
                             }
+                            else if (sortBy?.ToLower() == "capacity")
+                            {
+                                query += " s.Capacity ";
+                            }
                             else
                             {
                                 if (clientLanguage.ToLower() == "fin") query += " s.NameFin ";

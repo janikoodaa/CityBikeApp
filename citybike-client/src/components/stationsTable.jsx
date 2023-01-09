@@ -119,16 +119,17 @@ export default function StationsTable() {
      };
 
      const dataGridColumns = [
-          { field: stationNameCol(language), headerName: translations.stationName[language], width: 200, hideable: false },
-          { field: stationAddressCol(language), headerName: translations.stationAddress[language], flex: 2, hideable: false },
-          { field: stationCityCol(language), headerName: translations.city[language], width: 120, hideable: false },
-          { field: "operator", headerName: translations.operator[language], width: 150, hideable: false },
-          { field: "capacity", headerName: translations.capacity[language], width: 100, hideable: false, type: "number" },
+          { field: stationNameCol(language), headerName: translations.stationName[language], width: 200, hideable: false, filterable: false },
+          { field: stationAddressCol(language), headerName: translations.stationAddress[language], flex: 2, hideable: false, filterable: false },
+          { field: stationCityCol(language), headerName: translations.city[language], width: 120, hideable: false, filterable: false },
+          { field: "operator", headerName: translations.operator[language], width: 150, hideable: false, filterable: false },
+          { field: "capacity", headerName: translations.capacity[language], width: 100, hideable: false, filterable: false, type: "number" },
           {
                field: "id",
                headerName: "Info",
                width: 100,
                hideable: false,
+               filterable: false,
                headerAlign: "center",
                renderCell: InfoButton,
                align: "center",
@@ -136,16 +137,12 @@ export default function StationsTable() {
      ];
 
      const handleSortModelChange = useCallback((sortModel) => {
-          dispatchQueryParams({ type: ACTION_TYPES.UPDATE_SORT_MODEL, payload: { field: sortModel.field, sort: sortModel.sort } });
-     });
-
-     const handleFilterModelChange = useCallback((filterModel) => {
-          let field = filterModel.items[0]?.columnField.substring(0, filterModel.items[0].columnField.length - 3);
-          let value = filterModel.items[0].value || "";
-          dispatchQueryParams({
-               type: ACTION_TYPES.UPDATE_FILTER_MODEL,
-               payload: { field: field, value: value },
-          });
+          console.log(sortModel);
+          let sortField = sortModel[0].field;
+          if (sortField.endsWith("Fin") || sortField.endsWith("Swe") || sortField.endsWith("Eng")) {
+               sortField = sortField.substring(0, sortField.length - 3);
+          }
+          dispatchQueryParams({ type: ACTION_TYPES.UPDATE_SORT_MODEL, payload: { field: sortField, sort: sortModel[0].sort } });
      });
 
      const handlePageChange = useCallback((newPage) => {
@@ -205,12 +202,12 @@ export default function StationsTable() {
                     rowsPerPageOptions={[50, 100]}
                     sortingMode="server"
                     onSortModelChange={handleSortModelChange}
-                    filterMode="server"
-                    onFilterModelChange={handleFilterModelChange}
                     paginationMode="server"
                     onPageChange={(newPage) => handlePageChange(newPage)}
                     pageSize={queryParams.rowsPerPage}
                     onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
+                    disableSelectionOnClick
+                    disableColumnMenu
                     sx={{ backgroundColor: "white" }}
                />
           </Container>
