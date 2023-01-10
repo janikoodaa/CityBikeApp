@@ -25,17 +25,17 @@ namespace CityBikeAPI.Controllers
         [HttpGet("list")]
         public IActionResult GetTripsList([FromQuery] DateTime? departureDateFrom, [FromQuery] DateTime? departureDateTo, [FromQuery] string? departureStationName, [FromQuery] string? returnStationName, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
-            if (rowsPerPage < 1 || rowsPerPage > 500 || page < 1)
+            if (rowsPerPage < 1 || rowsPerPage > 500 || page < 0)
             {
-                return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 1).");
+                return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 0).");
             }
 
-            List<Trip> trips = new();
+            PaginatedTrips trips = new();
 
             try
             {
                 trips = _repository.GetTrips(departureDateFrom, departureDateTo, departureStationName, returnStationName, sortBy, sortDir, rowsPerPage, page, clientLanguage);
-                if (trips.Count == 0)
+                if (trips.Trips.Count == 0)
                 {
                     return StatusCode(404, trips);
                 }

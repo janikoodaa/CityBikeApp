@@ -173,34 +173,30 @@ namespace CityBikeAPI.Data
             }
         }
 
-        public List<Trip> GetTrips(DateTime? departureDateFrom, DateTime? departureDateTo, string? departureStationName, string? returnStationName, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
+        public PaginatedTrips GetTrips(DateTime? departureDateFrom, DateTime? departureDateTo, string? departureStationName, string? returnStationName, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
         {
-            List<Trip> trips = new();
+            PaginatedTrips data = new();
             try
             {
                 using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("CityBikeDB")))
                 {
-                    using (SqlCommand cmd = new SqlCommand())
+                    using (SqlCommand cmd1 = new SqlCommand())
                     {
-                        cmd.Connection = connection;
-                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd1.Connection = connection;
+                        cmd1.CommandType = System.Data.CommandType.Text;
 
                         // Build query string depending on the incoming parameteres
-                        string query = @"select t.Id, t.DepartureDate, t.DepartureStationId, t.DepartureStationNameFin, t.DepartureStationNameSwe, t.DepartureStationNameEng, t.DepartureStationAddressFin, t.DepartureStationAddressSwe, "
-                                       + " t.DepartureStationCityFin, t.DepartureStationCitySwe, t.DepartureStationOperator, t.DepartureStationCapacity, t.DepartureStationXCoordinate, t.DepartureStationYCoordinate, t.ReturnDate, "
-                                       + " t.ReturnStationId, t.ReturnStationNameFin, t.ReturnStationNameSwe, t.ReturnStationNameEng, t.ReturnStationAddressFin, t.ReturnStationAddressSwe, t.ReturnStationCityFin, t.ReturnStationCitySwe, "
-                                       + " t.ReturnStationOperator, t.ReturnStationCapacity, t.ReturnStationXCoordinate, t.ReturnStationYCoordinate, t.CoveredDistanceInMeters, t.DurationInSeconds "
-                                       + " from citybike.Trips_v t where 1 = 1 ";
+                        string query = @"select count(1) from citybike.Trips_v t where 1 = 1 ";
                         // Search conditions
                         if (departureDateFrom != null)
                         {
                             query += " and t.DepartureDate >= @DepartureDateFrom ";
-                            cmd.Parameters.Add("DepartureDateFrom", SqlDbType.DateTime).Value = departureDateFrom;
+                            cmd1.Parameters.Add("DepartureDateFrom", SqlDbType.DateTime).Value = departureDateFrom;
                         }
                         if (departureDateTo != null)
                         {
                             query += " and t.DepartureDate <= @DepartureDateTo ";
-                            cmd.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateTo;
+                            cmd1.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateTo;
                         }
                         if (departureStationName != null)
                         {
@@ -216,7 +212,7 @@ namespace CityBikeAPI.Data
                                     query += " and lower(t.DepartureStationNameFin) like @DepartureStationName ";
                                     break;
                             }
-                            cmd.Parameters.Add("DepartureStationName", SqlDbType.NVarChar).Value = $"%{departureStationName.ToLower()}%";
+                            cmd1.Parameters.Add("DepartureStationName", SqlDbType.NVarChar).Value = $"%{departureStationName.ToLower()}%";
                         }
                         if (returnStationName != null)
                         {
@@ -232,111 +228,187 @@ namespace CityBikeAPI.Data
                                     query += " and lower(t.ReturnStationNameFin) like @ReturnStationName ";
                                     break;
                             }
-                            cmd.Parameters.Add("ReturnStationName", SqlDbType.NVarChar).Value = $"%{returnStationName.ToLower()}%";
+                            cmd1.Parameters.Add("ReturnStationName", SqlDbType.NVarChar).Value = $"%{returnStationName.ToLower()}%";
                         }
-                        // Order by
-                        switch (sortBy?.ToLower())
-                        {
-                            case "departurestationname":
-                                switch (clientLanguage.ToLower())
-                                {
-                                    case "swe":
-                                        query += " order by t.DepartureStationNameSwe ";
-                                        break;
-                                    case "eng":
-                                        query += " order by t.DepartureStationNameEng ";
-                                        break;
-                                    default:
-                                        query += " order by t.DepartureStationNameFin ";
-                                        break;
-                                }
-                                break;
-                            case "returnstationname":
-                                switch (clientLanguage.ToLower())
-                                {
-                                    case "swe":
-                                        query += " order by t.ReturnStationNameSwe ";
-                                        break;
-                                    case "eng":
-                                        query += " order by t.ReturnStationNameEng ";
-                                        break;
-                                    default:
-                                        query += " order by t.ReturnStationNameFin ";
-                                        break;
-                                }
-                                break;
-                            case "distance":
-                                query += " order by t.DistanceInMeters ";
-                                break;
-                            case "duration":
-                                query += " order by t.DurationInSeconds ";
-                                break;
-                            default:
-                                query += " order by t.DepartureDate ";
-                                break;
-                        }
-                        // Order direction
-                        if (sortDir?.ToLower() == "asc")
-                        {
-                            query += " asc ";
-                        }
-                        else
-                        {
-                            query += " desc ";
-                        }
-                        // Pagination
-                        query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
-                        cmd.Parameters.Add("Offset", SqlDbType.Int).Value = (page - 1) * rowsPerPage;
-                        cmd.Parameters.Add("RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
+
                         // Assign complete query string to CommandText
-                        cmd.CommandText = query;
+                        cmd1.CommandText = query;
 
                         connection.Open();
-                        SqlDataReader reader = cmd.ExecuteReader();
+                        SqlDataReader reader = cmd1.ExecuteReader();
 
-                        while (reader.Read())
+                        if (reader.HasRows)
                         {
-                            trips.Add(new Trip(
-                                reader.GetInt32(reader.GetOrdinal("Id")),
-                                reader.GetDateTime(reader.GetOrdinal("DepartureDate")),
-                                reader.GetDateTime(reader.GetOrdinal("ReturnDate")),
-                                new Station(
-                                    reader.GetInt32(reader.GetOrdinal("DepartureStationId")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationNameFin")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationNameSwe")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationNameEng")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationAddressFin")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationAddressSwe")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationCityFin")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationCitySwe")),
-                                    reader.GetString(reader.GetOrdinal("DepartureStationOperator")),
-                                    reader.GetInt32(reader.GetOrdinal("DepartureStationCapacity")),
-                                    reader.GetDecimal(reader.GetOrdinal("DepartureStationXCoordinate")),
-                                    reader.GetDecimal(reader.GetOrdinal("DepartureStationYCoordinate"))
-                                    ),
-                                new Station(
-                                    reader.GetInt32(reader.GetOrdinal("ReturnStationId")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationNameFin")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationNameSwe")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationNameEng")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationAddressFin")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationAddressSwe")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationCityFin")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationCitySwe")),
-                                    reader.GetString(reader.GetOrdinal("ReturnStationOperator")),
-                                    reader.GetInt32(reader.GetOrdinal("ReturnStationCapacity")),
-                                    reader.GetDecimal(reader.GetOrdinal("ReturnStationXCoordinate")),
-                                    reader.GetDecimal(reader.GetOrdinal("ReturnStationYCoordinate"))
-                                    ),
-                                reader.GetInt32(reader.GetOrdinal("CoveredDistanceInMeters")),
-                                reader.GetInt32(reader.GetOrdinal("DurationInSeconds"))
-                                ));
+                            while (reader.Read())
+                            {
+                                data.TotalRowCount = reader.GetInt32(0);
+                            }
                         }
                         reader.Close();
                         connection.Close();
                     }
+                    if (data.TotalRowCount > 0)
+                    {
+                        using (SqlCommand cmd2 = new SqlCommand())
+                        {
+                            cmd2.Connection = connection;
+                            cmd2.CommandType = System.Data.CommandType.Text;
+
+                            // Build query string depending on the incoming parameteres
+                            string query = @"select t.Id, t.DepartureDate, t.DepartureStationId, t.DepartureStationNameFin, t.DepartureStationNameSwe, t.DepartureStationNameEng, t.DepartureStationAddressFin, t.DepartureStationAddressSwe, "
+                                           + " t.DepartureStationCityFin, t.DepartureStationCitySwe, t.DepartureStationOperator, t.DepartureStationCapacity, t.DepartureStationXCoordinate, t.DepartureStationYCoordinate, t.ReturnDate, "
+                                           + " t.ReturnStationId, t.ReturnStationNameFin, t.ReturnStationNameSwe, t.ReturnStationNameEng, t.ReturnStationAddressFin, t.ReturnStationAddressSwe, t.ReturnStationCityFin, t.ReturnStationCitySwe, "
+                                           + " t.ReturnStationOperator, t.ReturnStationCapacity, t.ReturnStationXCoordinate, t.ReturnStationYCoordinate, t.CoveredDistanceInMeters, t.DurationInSeconds "
+                                           + " from citybike.Trips_v t where 1 = 1 ";
+                            // Search conditions
+                            if (departureDateFrom != null)
+                            {
+                                query += " and t.DepartureDate >= @DepartureDateFrom ";
+                                cmd2.Parameters.Add("DepartureDateFrom", SqlDbType.DateTime).Value = departureDateFrom;
+                            }
+                            if (departureDateTo != null)
+                            {
+                                query += " and t.DepartureDate <= @DepartureDateTo ";
+                                cmd2.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateTo;
+                            }
+                            if (departureStationName != null)
+                            {
+                                switch (clientLanguage.ToLower())
+                                {
+                                    case "swe":
+                                        query += " and lower(t.DepartureStationNameSwe) like @DepartureStationName ";
+                                        break;
+                                    case "eng":
+                                        query += " and lower(t.DepartureStationNameEng) like @DepartureStationName ";
+                                        break;
+                                    default:
+                                        query += " and lower(t.DepartureStationNameFin) like @DepartureStationName ";
+                                        break;
+                                }
+                                cmd2.Parameters.Add("DepartureStationName", SqlDbType.NVarChar).Value = $"%{departureStationName.ToLower()}%";
+                            }
+                            if (returnStationName != null)
+                            {
+                                switch (clientLanguage.ToLower())
+                                {
+                                    case "swe":
+                                        query += " and lower(t.ReturnStationNameSwe) like @ReturnStationName ";
+                                        break;
+                                    case "eng":
+                                        query += " and lower(t.ReturnStationNameEng) like @ReturnStationName ";
+                                        break;
+                                    default:
+                                        query += " and lower(t.ReturnStationNameFin) like @ReturnStationName ";
+                                        break;
+                                }
+                                cmd2.Parameters.Add("ReturnStationName", SqlDbType.NVarChar).Value = $"%{returnStationName.ToLower()}%";
+                            }
+                            // Order by
+                            switch (sortBy?.ToLower())
+                            {
+                                case "departurestationname":
+                                    switch (clientLanguage.ToLower())
+                                    {
+                                        case "swe":
+                                            query += " order by t.DepartureStationNameSwe ";
+                                            break;
+                                        case "eng":
+                                            query += " order by t.DepartureStationNameEng ";
+                                            break;
+                                        default:
+                                            query += " order by t.DepartureStationNameFin ";
+                                            break;
+                                    }
+                                    break;
+                                case "returnstationname":
+                                    switch (clientLanguage.ToLower())
+                                    {
+                                        case "swe":
+                                            query += " order by t.ReturnStationNameSwe ";
+                                            break;
+                                        case "eng":
+                                            query += " order by t.ReturnStationNameEng ";
+                                            break;
+                                        default:
+                                            query += " order by t.ReturnStationNameFin ";
+                                            break;
+                                    }
+                                    break;
+                                case "distance":
+                                    query += " order by t.DistanceInMeters ";
+                                    break;
+                                case "duration":
+                                    query += " order by t.DurationInSeconds ";
+                                    break;
+                                default:
+                                    query += " order by t.DepartureDate ";
+                                    break;
+                            }
+                            // Order direction
+                            if (sortDir?.ToLower() == "asc")
+                            {
+                                query += " asc ";
+                            }
+                            else
+                            {
+                                query += " desc ";
+                            }
+                            // Pagination
+                            query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
+                            cmd2.Parameters.Add("Offset", SqlDbType.Int).Value = page * rowsPerPage;
+                            cmd2.Parameters.Add("RowsPerPage", SqlDbType.Int).Value = rowsPerPage;
+                            // Assign complete query string to CommandText
+                            cmd2.CommandText = query;
+
+                            connection.Open();
+                            SqlDataReader reader = cmd2.ExecuteReader();
+
+                            while (reader.Read())
+                            {
+                                data.Trips.Add(new Trip(
+                                    reader.GetInt32(reader.GetOrdinal("Id")),
+                                    reader.GetDateTime(reader.GetOrdinal("DepartureDate")),
+                                    reader.GetDateTime(reader.GetOrdinal("ReturnDate")),
+                                    new Station(
+                                        reader.GetInt32(reader.GetOrdinal("DepartureStationId")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationNameFin")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationNameSwe")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationNameEng")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationAddressFin")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationAddressSwe")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationCityFin")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationCitySwe")),
+                                        reader.GetString(reader.GetOrdinal("DepartureStationOperator")),
+                                        reader.GetInt32(reader.GetOrdinal("DepartureStationCapacity")),
+                                        reader.GetDecimal(reader.GetOrdinal("DepartureStationXCoordinate")),
+                                        reader.GetDecimal(reader.GetOrdinal("DepartureStationYCoordinate"))
+                                        ),
+                                    new Station(
+                                        reader.GetInt32(reader.GetOrdinal("ReturnStationId")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationNameFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationNameSwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationNameEng")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationAddressFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationAddressSwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationCityFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationCitySwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationOperator")),
+                                        reader.GetInt32(reader.GetOrdinal("ReturnStationCapacity")),
+                                        reader.GetDecimal(reader.GetOrdinal("ReturnStationXCoordinate")),
+                                        reader.GetDecimal(reader.GetOrdinal("ReturnStationYCoordinate"))
+                                        ),
+                                    reader.GetInt32(reader.GetOrdinal("CoveredDistanceInMeters")),
+                                    reader.GetInt32(reader.GetOrdinal("DurationInSeconds"))
+                                    ));
+                                data.RowsFrom = page * rowsPerPage + 1;
+                                data.RowsTo = page * rowsPerPage + data.Trips.Count;
+                            }
+                            reader.Close();
+                            connection.Close();
+                        }
+                    }
                 }
-                return trips;
+                return data;
             }
             catch
             {
