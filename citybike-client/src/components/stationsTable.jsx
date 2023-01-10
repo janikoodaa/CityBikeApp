@@ -150,9 +150,11 @@ export default function StationsTable() {
 
           const controller = new AbortController();
           const signal = controller.signal;
-          const apiUrl = "https://localhost:7279/api/";
-          let endpoint = `${apiUrl}stations/list?name=${queryParams.name}&address=${queryParams.address}&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}&rowsperpage=${queryParams.rowsPerPage}&page=${queryParams.page}`;
           let headers = { clientLanguage: language };
+          let endpoint =
+               `${import.meta.env.VITE_BACKEND_URL}stations/list?name=${queryParams.name}&address=${queryParams.address}` +
+               `&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}` +
+               `&rowsperpage=${queryParams.rowsPerPage}&page=${queryParams.page}`;
 
           const getData = async () => {
                try {
@@ -165,9 +167,9 @@ export default function StationsTable() {
                     let data = await response.json();
                     setStations(data);
                } catch (error) {
+                    setStations(emptyData);
                     if (error.name !== "AbortError") {
-                         console.log("Error: ", error);
-                         setStations(emptyData);
+                         console.log(error.message);
                     }
                }
           };
