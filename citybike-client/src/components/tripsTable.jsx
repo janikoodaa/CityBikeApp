@@ -7,32 +7,32 @@ import TripsFilter from "./tripsFilter";
 const translations = {
      departureStationName: {
           fin: "Lähtöasema",
-          swe: "Start station",
+          swe: "Avgång station",
           eng: "Departure station",
      },
      returnStationName: {
           fin: "Paluuasema",
-          swe: "Stop station",
+          swe: "Återkomst station",
           eng: "Return station",
      },
      departureDate: {
           fin: "Lähtö",
-          swe: "Start",
+          swe: "Avgång",
           eng: "Departure",
      },
      returnDate: {
           fin: "Paluu",
-          swe: "Stop",
+          swe: "Återkomst",
           eng: "Return",
      },
      duration: {
           fin: "Kesto (min)",
-          swe: "(min)",
+          swe: "Längd (min)",
           eng: "Duration (min)",
      },
      distance: {
           fin: "Matka (km)",
-          swe: "(km)",
+          swe: "Distans (km)",
           eng: "Distance (km)",
      },
 };
@@ -45,8 +45,8 @@ const emptyData = {
 };
 
 const initialQueryParams = {
-     departureDate: null,
-     returnDate: null,
+     departureDateFrom: null,
+     departureDateTo: null,
      departureStation: "",
      returnStation: "",
      sortBy: "departuredate",
@@ -65,7 +65,14 @@ const ACTION_TYPES = Object.freeze({
 function updateQueryParams(queryParams, action) {
      switch (action.type) {
           case ACTION_TYPES.UPDATE_FILTER_MODEL: {
-               return { ...queryParams, name: action.payload.name, address: action.payload.address, city: action.payload.city };
+               return {
+                    ...queryParams,
+                    departureStation: action.payload.departureStation,
+                    returnStation: action.payload.returnStation,
+                    departureDateFrom: action.payload.departureDateFrom,
+                    departureDateTo: action.payload.departureDateTo,
+                    page: 0,
+               };
           }
           case ACTION_TYPES.UPDATE_SORT_MODEL:
                return { ...queryParams, sortBy: action.payload.field, sortDir: action.payload.sort };
@@ -98,12 +105,39 @@ export default function TripsTable() {
           }
      };
 
+     const dateColFormatter = (params, type) => {
+          switch (language) {
+               case "eng":
+                    if (type === "departure") return new Date(params.row?.departureDate).toLocaleString("en-GB");
+                    return new Date(params.row?.returnDate).toLocaleString("en-GB");
+               default:
+                    if (type === "departure") return new Date(params.row?.departureDate).toLocaleString("fi-FI");
+                    return new Date(params.row?.returnDate).toLocaleString("fi-FI");
+          }
+     };
+
+     const distanceFormatter = (params) => {
+          switch (language) {
+               case "eng":
+                    return (params.row?.distanceMeters / 1000).toLocaleString("en-GB", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+               default:
+                    return (params.row?.distanceMeters / 1000).toLocaleString("fi-FI", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+          }
+     };
+
+     const durationFormatter = (params) => {
+          let minutes = (params.row?.durationSeconds / 60).toFixed(0);
+          let seconds = params.row?.durationSeconds % 60;
+          return `${minutes.toString()}.${seconds < 10 ? `0${seconds}` : seconds.toString()}`;
+     };
+
      const dataGridColumns = [
           {
                field: "departureDate",
+               valueGetter: (params) => dateColFormatter(params, "departure"),
                headerName: translations.departureDate[language],
                type: "dateTime",
-               width: 200,
+               flex: 2,
                hideable: false,
                filterable: false,
           },
@@ -111,24 +145,55 @@ export default function TripsTable() {
                field: "departureStation",
                valueGetter: (params) => stationNameCol(params, "departure"),
                headerName: translations.departureStationName[language],
-               width: 200,
+               flex: 2,
                hideable: false,
                filterable: false,
           },
-          { field: "returnDate", headerName: translations.returnDate[language], type: "dateTime", width: 200, hideable: false, filterable: false },
+          {
+               field: "returnDate",
+               valueGetter: (params) => dateColFormatter(params, "return"),
+               headerName: translations.returnDate[language],
+               type: "dateTime",
+               flex: 2,
+               hideable: false,
+               filterable: false,
+          },
           {
                field: "returnStation",
                valueGetter: (params) => stationNameCol(params, "return"),
-               headerName: translations.departureStationName[language],
-               width: 200,
+               headerName: translations.returnStationName[language],
+               flex: 2,
                hideable: false,
                filterable: false,
           },
-          { field: "distanceMeters", headerName: translations.distance[language], width: 100, hideable: false, filterable: false, type: "number" },
-          { field: "durationSeconds", headerName: translations.duration[language], width: 100, hideable: false, filterable: false, type: "number" },
+          {
+               field: "distanceMeters",
+               valueGetter: (params) => distanceFormatter(params),
+               headerName: translations.distance[language],
+               width: 115,
+               hideable: false,
+               filterable: false,
+               type: "number",
+          },
+          {
+               field: "durationSeconds",
+               valueGetter: (params) => durationFormatter(params),
+               headerName: translations.duration[language],
+               width: 115,
+               hideable: false,
+               filterable: false,
+               type: "number",
+          },
      ];
 
      const handleSortModelChange = useCallback((sortModel) => {
+          if (sortModel.length === 0) {
+               dispatchQueryParams({
+                    type: ACTION_TYPES.UPDATE_SORT_MODEL,
+                    payload: { field: initialQueryParams.sortBy, sort: initialQueryParams.sortDir },
+               });
+               return;
+          }
           let sortField = sortModel[0].field;
           if (sortField.endsWith("Fin") || sortField.endsWith("Swe") || sortField.endsWith("Eng")) {
                sortField = sortField.substring(0, sortField.length - 3);
@@ -151,8 +216,12 @@ export default function TripsTable() {
           const controller = new AbortController();
           const signal = controller.signal;
           let headers = { clientLanguage: language };
+          let dateFromString = queryParams.departureDateFrom && new Date(queryParams.departureDateFrom)?.toISOString().substring(0, 10);
+          let dateToString = queryParams.departureDateTo && new Date(queryParams.departureDateTo)?.toISOString().substring(0, 10);
           let endpoint =
-               `${import.meta.env.VITE_BACKEND_URL}trips/list?departureDateFrom=2021-07-01&sortby=${queryParams.sortBy}` +
+               `${import.meta.env.VITE_BACKEND_URL}trips/list?departureDateFrom=${dateFromString || ""}` +
+               `&departureDateTo=${dateToString || ""}&departurestationname=${queryParams.departureStation}` +
+               `&returnstationname=${queryParams.returnStation}&sortby=${queryParams.sortBy}` +
                `&sortdir=${queryParams.sortDir}&rowsPerPage=${queryParams.rowsPerPage}&page=${queryParams.page}`;
 
           const getData = async () => {
@@ -163,13 +232,17 @@ export default function TripsTable() {
                          mode: "cors",
                          signal: signal,
                     });
-                    let data = await response.json();
-                    console.log(data);
-                    setTrips(data);
+                    if (response.status === 200) {
+                         let data = await response.json();
+                         setTrips(data);
+                    }
+                    if (response.status === 404) {
+                         setTrips(emptyData);
+                    }
                } catch (error) {
                     setTrips(emptyData);
                     if (error.name !== "AbortError") {
-                         console.log(error.message);
+                         console.error(error.message);
                     }
                }
           };
@@ -189,12 +262,17 @@ export default function TripsTable() {
                />
                <Container
                     maxWidth="xl"
-                    sx={{ display: "flex", justifyContent: "center", height: 500, width: { xs: "100%", md: "80%" } }}
+                    sx={{
+                         display: "flex",
+                         justifyContent: "center",
+                         height: { xs: "60vh", md: "65vh", lg: "70vh" },
+                         width: { xs: "100%", md: "80%" },
+                    }}
                >
                     <DataGrid
                          columns={dataGridColumns}
                          rows={trips.trips}
-                         rowHeight={60}
+                         rowHeight={50}
                          loading={loadingData}
                          page={parseInt(queryParams.page)}
                          rowCount={trips.totalRowCount}

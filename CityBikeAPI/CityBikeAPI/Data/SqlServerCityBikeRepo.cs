@@ -176,6 +176,12 @@ namespace CityBikeAPI.Data
         public PaginatedTrips GetTrips(DateTime? departureDateFrom, DateTime? departureDateTo, string? departureStationName, string? returnStationName, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
         {
             PaginatedTrips data = new();
+            DateTime? departureDateToEnd = null;
+            if (departureDateTo != null)
+            {
+                departureDateToEnd = departureDateTo!.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+            }
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("CityBikeDB")))
@@ -196,7 +202,7 @@ namespace CityBikeAPI.Data
                         if (departureDateTo != null)
                         {
                             query += " and t.DepartureDate <= @DepartureDateTo ";
-                            cmd1.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateTo;
+                            cmd1.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateToEnd;
                         }
                         if (departureStationName != null)
                         {
@@ -269,7 +275,7 @@ namespace CityBikeAPI.Data
                             if (departureDateTo != null)
                             {
                                 query += " and t.DepartureDate <= @DepartureDateTo ";
-                                cmd2.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateTo;
+                                cmd2.Parameters.Add("DepartureDateTo", SqlDbType.DateTime).Value = departureDateToEnd;
                             }
                             if (departureStationName != null)
                             {
