@@ -1,17 +1,9 @@
 import { createTheme } from "@mui/material/styles";
 import { yellow, grey } from "@mui/material/colors";
-import { fiFI, svSE } from "@mui/x-data-grid";
-
-// const getDataGridLocale = () => {
-//      switch (sessionStorage.getItem("citybikelanguage")) {
-//           case "fin":
-//                return fiFI;
-//           case "swe":
-//                return svSE;
-//           default:
-//                return null;
-//      }
-// };
+import { fiFI as DataGridFiFI, svSE as DataGridSvSE } from "@mui/x-data-grid";
+import { fiFI as DatePickerFiFI, svSE as DatePickerSvSE } from "@mui/x-date-pickers";
+import "dayjs/locale/fi";
+import "dayjs/locale/sv";
 
 export const theme = createTheme({
      palette: {
@@ -65,6 +57,6 @@ export const theme = createTheme({
      },
 });
 
-export const gridLocaleFin = createTheme(fiFI);
-export const gridLocaleSwe = createTheme(svSE);
+export const gridLocaleFin = createTheme(DataGridFiFI, DatePickerFiFI);
+export const gridLocaleSwe = createTheme(DataGridSvSE, DatePickerSvSE);
 export const gridLocaleEng = createTheme();

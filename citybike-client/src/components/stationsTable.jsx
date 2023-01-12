@@ -129,6 +129,13 @@ export default function StationsTable() {
      ];
 
      const handleSortModelChange = useCallback((sortModel) => {
+          if (sortModel.length === 0) {
+               dispatchQueryParams({
+                    type: ACTION_TYPES.UPDATE_SORT_MODEL,
+                    payload: { field: initialQueryParams.sortBy, sort: initialQueryParams.sortDir },
+               });
+               return;
+          }
           let sortField = sortModel[0].field;
           if (sortField.endsWith("Fin") || sortField.endsWith("Swe") || sortField.endsWith("Eng")) {
                sortField = sortField.substring(0, sortField.length - 3);
@@ -150,7 +157,7 @@ export default function StationsTable() {
 
           const controller = new AbortController();
           const signal = controller.signal;
-          let headers = { clientLanguage: language };
+          let headers = { clientLanguage: language, "Access-Control-Allow-Headers": "Accept" };
           let endpoint =
                `${import.meta.env.VITE_BACKEND_URL}stations/list?name=${queryParams.name}&address=${queryParams.address}` +
                `&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}` +
@@ -164,12 +171,18 @@ export default function StationsTable() {
                          mode: "cors",
                          signal: signal,
                     });
-                    let data = await response.json();
-                    setStations(data);
+
+                    if (response.status === 200) {
+                         let data = await response.json();
+                         setStations(data);
+                    }
+                    if (response.status === 404) {
+                         setStations(emptyData);
+                    }
                } catch (error) {
                     setStations(emptyData);
                     if (error.name !== "AbortError") {
-                         console.log(error.message);
+                         console.error(error.message);
                     }
                }
           };
@@ -189,12 +202,17 @@ export default function StationsTable() {
                />
                <Container
                     maxWidth="xl"
-                    sx={{ display: "flex", justifyContent: "center", height: 500, width: { xs: "100%", md: "80%" } }}
+                    sx={{
+                         display: "flex",
+                         justifyContent: "center",
+                         height: { xs: "60vh", md: "65vh", lg: "70vh" },
+                         width: { xs: "100%", md: "80%" },
+                    }}
                >
                     <DataGrid
                          columns={dataGridColumns}
                          rows={stations.stations}
-                         rowHeight={60}
+                         rowHeight={50}
                          loading={loadingData}
                          page={parseInt(queryParams.page)}
                          rowCount={stations.totalRowCount}
