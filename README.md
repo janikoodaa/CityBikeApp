@@ -54,3 +54,7 @@ Now the database is ready :+1:
 
 -    App is built responsive, so give it a try, and test different window sizes.
 -    App supports three languages, and the language selection is stored in session storage.
+
+## Possible problems
+
+-    App is tested on Chrome and Firefox. Firefox seems to be quite strict with certificates and as the backend is using https, there might be problem, which it tells to relate to CORS. This can be easily fixed, by opening both, client and backend URLs in the same browser and accepting the self-signed certificates for localhost. If problem still persists, you can try to host also client using https. Just check [vite.config.js](citybike-client/vite.config.js), needed @vitejs/plugin-basic-ssl is already included in project dependencies.
