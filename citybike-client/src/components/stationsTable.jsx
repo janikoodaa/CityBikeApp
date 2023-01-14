@@ -2,9 +2,8 @@ import { useState, useReducer, useEffect, useCallback } from "react";
 import { useLanguageContext } from "../context/languageContext";
 import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StationsFilter from "./stationsFilter";
+import StationsDialog from "./stationsDialog";
 
 const translations = {
      stationName: {
@@ -39,6 +38,21 @@ const emptyData = {
      rowsTo: 0,
      totalRowCount: 0,
      stations: [],
+};
+
+const emptyDialog = {
+     id: null,
+     nameFin: "",
+     nameSwe: "",
+     nameEng: "",
+     addressFin: "",
+     addressSwe: "",
+     cityFin: "",
+     citySwe: "",
+     operator: "",
+     capacity: null,
+     xCoordinate: null,
+     yCoordinate: null,
 };
 
 const initialQueryParams = {
@@ -100,15 +114,8 @@ export default function StationsTable() {
      const [stations, setStations] = useState(emptyData);
      const [queryParams, dispatchQueryParams] = useReducer(updateQueryParams, initialQueryParams);
      const [loadingData, setLoadingData] = useState(false);
-
-     const InfoButton = (props) => {
-          const { value } = props;
-          return (
-               <IconButton onClick={() => console.log(value)}>
-                    <InfoOutlinedIcon />
-               </IconButton>
-          );
-     };
+     const [dialogOpen, setDialogOpen] = useState(false);
+     const [stationInDialog, setStationInDialog] = useState(emptyDialog);
 
      const dataGridColumns = [
           { field: stationNameCol(language), headerName: translations.stationName[language], width: 200, hideable: false, filterable: false },
@@ -116,16 +123,6 @@ export default function StationsTable() {
           { field: stationCityCol(language), headerName: translations.city[language], width: 120, hideable: false, filterable: false },
           { field: "operator", headerName: translations.operator[language], width: 150, hideable: false, filterable: false },
           { field: "capacity", headerName: translations.capacity[language], width: 100, hideable: false, filterable: false, type: "number" },
-          {
-               field: "id",
-               headerName: "Info",
-               width: 100,
-               hideable: false,
-               filterable: false,
-               headerAlign: "center",
-               renderCell: InfoButton,
-               align: "center",
-          },
      ];
 
      const handleSortModelChange = useCallback((sortModel) => {
@@ -151,6 +148,16 @@ export default function StationsTable() {
           let newPage = (stations.rowsFrom / newPageSize).toFixed(0);
           dispatchQueryParams({ type: ACTION_TYPES.UPDATE_ROWS_PER_PAGE, payload: { newPageSize: newPageSize, newPage: newPage } });
      });
+
+     const handleOpenDialog = (props) => {
+          setStationInDialog(props.row);
+          setDialogOpen(true);
+     };
+
+     const handleCloseDialog = () => {
+          setDialogOpen(false);
+          setStationInDialog(emptyDialog);
+     };
 
      useEffect(() => {
           setLoadingData(true);
@@ -225,9 +232,16 @@ export default function StationsTable() {
                          onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
                          disableSelectionOnClick
                          disableColumnMenu
+                         onRowClick={handleOpenDialog}
                          sx={{ backgroundColor: "white" }}
                     />
                </Container>
+               <StationsDialog
+                    dialogOpen={dialogOpen}
+                    stationInDialog={stationInDialog}
+                    handleCloseDialog={handleCloseDialog}
+                    translations={translations}
+               />
           </>
      );
 }

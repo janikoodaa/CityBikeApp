@@ -42,6 +42,11 @@ Now the database is ready :+1:
 1. For backend you need to have [.NET 7.0 runtime](https://dotnet.microsoft.com/download/dotnet) installed.
 2. For client you need to have [Node.js runtime](https://nodejs.org/en/) installed. Preferred version is ^18.12.1.
 
+## Getting started, Google Maps Platform
+
+Client application has embedded Google Maps to visualize the station locations. **Maps Embed API** requires API key to work, so to get things up and running, you need to create one. For instructions see [https://developers.google.com/maps/get-started](https://developers.google.com/maps/get-started). Once you have the API key, create new _.env.development_ -file in [citybike-client](citybike-client) and add there VITE_MAPS_API_KEY={YOUR-OWN-API-KEY-HERE}.
+If no API key is created/added, application shows an embedded map with only one fixed position.
+
 ## To run the project
 
 1. Make sure the Docker container, where you have the database, is running.
