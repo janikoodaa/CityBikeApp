@@ -3,6 +3,7 @@ import { useLanguageContext } from "../context/languageContext";
 import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import TripsFilter from "./tripsFilter";
+import TripsDialog from "./tripsDialog";
 
 const translations = {
      departureStationName: {
@@ -42,6 +43,42 @@ const emptyData = {
      rowsTo: 0,
      totalRowCount: 0,
      trips: [],
+};
+
+const emptyDialog = {
+     id: null,
+     departureDate: "",
+     returnDate: "",
+     departureStation: {
+          id: 28,
+          nameFin: "",
+          nameSwe: "",
+          nameEng: "",
+          addressFin: "",
+          addressSwe: "",
+          cityFin: "",
+          citySwe: "",
+          operator: "",
+          capacity: null,
+          xCoordinate: null,
+          yCoordinate: null,
+     },
+     returnStation: {
+          id: null,
+          nameFin: "",
+          nameSwe: "",
+          nameEng: "",
+          addressFin: "",
+          addressSwe: "",
+          cityFin: "",
+          citySwe: "",
+          operator: "",
+          capacity: null,
+          xCoordinate: null,
+          yCoordinate: null,
+     },
+     distanceMeters: null,
+     durationSeconds: null,
 };
 
 const initialQueryParams = {
@@ -90,6 +127,8 @@ export default function TripsTable() {
      const [trips, setTrips] = useState(emptyData);
      const [queryParams, dispatchQueryParams] = useReducer(updateQueryParams, initialQueryParams);
      const [loadingData, setLoadingData] = useState(false);
+     const [dialogOpen, setDialogOpen] = useState(false);
+     const [tripInDialog, setTripInDialog] = useState(emptyDialog);
 
      const stationNameCol = (params, type) => {
           switch (language) {
@@ -210,6 +249,16 @@ export default function TripsTable() {
           dispatchQueryParams({ type: ACTION_TYPES.UPDATE_ROWS_PER_PAGE, payload: { newPageSize: newPageSize, newPage: newPage } });
      });
 
+     const handleOpenDialog = (props) => {
+          setTripInDialog(props.row);
+          setDialogOpen(true);
+     };
+
+     const handleCloseDialog = () => {
+          setDialogOpen(false);
+          setTripInDialog(emptyDialog);
+     };
+
      useEffect(() => {
           setLoadingData(true);
 
@@ -285,9 +334,15 @@ export default function TripsTable() {
                          onPageSizeChange={(newPageSize) => handlePageSizeChange(newPageSize)}
                          disableSelectionOnClick
                          disableColumnMenu
+                         onRowClick={handleOpenDialog}
                          sx={{ backgroundColor: "white" }}
                     />
                </Container>
+               <TripsDialog
+                    dialogOpen={dialogOpen}
+                    tripInDialog={tripInDialog}
+                    handleCloseDialog={handleCloseDialog}
+               />
           </>
      );
 }
