@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using CityBikeAPI.Data;
 using CityBikeAPI.Models;
@@ -39,7 +41,7 @@ namespace CityBikeAPI.Controllers
                 {
                     return StatusCode(404, stations);
                 }
-                else return StatusCode(200, stations);
+                return StatusCode(200, stations);
             }
             catch (Exception ex)
             {
@@ -47,6 +49,29 @@ namespace CityBikeAPI.Controllers
                 _logger.LogError($"{timestamp}, Exception message: {ex.Message}\n{timestamp}, StackTrace: {ex.StackTrace}\n{timestamp}, Arguments: [name: {name}, address: {address}, city: {city}, sortBy: {sortBy}, sortDir: {sortDir}, rowsPerPage: {rowsPerPage}, page: {page}, clientLanguage: {clientLanguage}].");
                 return StatusCode(500);
             }
+        }
+
+        [HttpGet("details/{id}")]
+        public IActionResult GetDetailsOfStation([FromRoute] int id, [FromQuery] DateTime? statsFrom, [FromQuery] DateTime? statsTo)
+        {
+            StationDetails details = new();
+
+            try
+            {
+                details = _repository.GetStationDetails(id, statsFrom, statsTo);
+                if (details.StationId <= 0)
+                {
+                    return StatusCode(404, details);
+                }
+                return StatusCode(200, details);
+            }
+            catch (Exception ex)
+            {
+                string timestamp = DateTime.Now.ToString("O");
+                _logger.LogError($"{timestamp}, Exception message: {ex.Message}\n{timestamp}, StackTrace: {ex.StackTrace}\n{timestamp}, Arguments: [id: {id}, statsFrom: {statsFrom}, statsTo: {statsTo}].");
+                return StatusCode(500);
+            }
+
         }
     }
 }

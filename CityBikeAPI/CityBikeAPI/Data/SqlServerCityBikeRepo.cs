@@ -5,6 +5,9 @@ using Microsoft.Data.SqlClient;
 using CityBikeAPI.Models;
 using System.Configuration;
 using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Globalization;
+using System.Collections.Generic;
 
 namespace CityBikeAPI.Data
 {
@@ -175,10 +178,163 @@ namespace CityBikeAPI.Data
             }
         }
 
+        public StationDetails GetStationDetails(int id, DateTime? statsFrom, DateTime? statsTo)
+        {
+            StationDetails details = new();
+            DateTime statsToEnd = new DateTime();
+            if (statsTo != null)
+            {
+                statsToEnd = statsTo!.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+            }
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("CityBikeDB")))
+                {
+                    using (SqlCommand cmd1 = new SqlCommand())
+                    {
+                        cmd1.Connection = connection;
+                        cmd1.CommandType = System.Data.CommandType.Text;
+                        cmd1.Parameters.Add("Id", SqlDbType.Int).Value = id;
+
+                        string departureDateFromCondition = "";
+                        string departureDateToCondition = "";
+
+                        if (statsFrom != null)
+                        {
+                            departureDateFromCondition = " and t.DepartureDate >= @StatsFrom ";
+                            cmd1.Parameters.Add("StatsFrom", SqlDbType.DateTime).Value = statsFrom;
+                        }
+
+                        if (statsTo != null)
+                        {
+                            departureDateToCondition = " and t.DepartureDate <= @StatsTo ";
+                            cmd1.Parameters.Add("StatsTo", SqlDbType.DateTime).Value = statsTo;
+                        }
+
+                        string query1 = $"select s.Id, (select count(1) from citybike.Trips_v t where t.DepartureStationId = @Id "
+                                        + $" {departureDateFromCondition} {departureDateToCondition} ) TripsStartingFrom, "
+                                        + " (select count(1) from citybike.Trips_v t where t.ReturnStationId = @Id "
+                                        + $" {departureDateFromCondition} {departureDateToCondition} ) TripsEndingTo, "
+                                        + " (select AVG(t.CoveredDistanceInMeters) from citybike.Trips_v t where t.DepartureStationId = @Id "
+                                        + $" {departureDateFromCondition} {departureDateToCondition} ) AvgDistanceStartingFrom, "
+                                        + " (select AVG(t.CoveredDistanceInMeters) from citybike.Trips_v t where t.ReturnStationId = @Id "
+                                        + $" {departureDateFromCondition} {departureDateToCondition} ) AvgDistanceEndingTo "
+                                        + " from citybike.Stations_v s "
+                                        + " where s.Id = @Id ";
+
+                        cmd1.CommandText = query1;
+
+                        connection.Open();
+                        SqlDataReader reader = cmd1.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                details.StationId = reader.GetInt32(reader.GetOrdinal("Id"));
+                                details.TripsCountFromStation = reader.GetInt32(reader.GetOrdinal("TripsStartingFrom"));
+                                details.TripsCountToStation = reader.GetInt32(reader.GetOrdinal("TripsEndingTo"));
+                                details.AverageDistanceFromStation = reader.GetInt32(reader.GetOrdinal("AvgDistanceStartingFrom"));
+                                details.AverageDistanceToStation = reader.GetInt32(reader.GetOrdinal("AvgDistanceEndingTo"));
+                            }
+                        }
+                        reader.Close();
+
+                        string query2 = @"select top 5 count(t.ReturnStationId) CountTripsStartingFrom, t.ReturnStationId, t.ReturnStationNameFin, "
+                                           + " t.ReturnStationNameSwe, t.ReturnStationNameEng, t.ReturnStationAddressFin, t.ReturnStationAddressSwe, t.ReturnStationCityFin, t.ReturnStationCitySwe, "
+                                           + " t.ReturnStationOperator, t.ReturnStationCapacity, t.ReturnStationXCoordinate, t.ReturnStationYCoordinate "
+                                           + $" from citybike.Trips_v t where t.DepartureStationId = @Id {departureDateFromCondition} {departureDateToCondition} "
+                                           + " GROUP by t.ReturnStationId, t.ReturnStationNameFin, t.ReturnStationNameSwe, t.ReturnStationNameEng, t.ReturnStationAddressFin, "
+                                           + " t.ReturnStationAddressSwe, t.ReturnStationCityFin, t.ReturnStationCitySwe, t.ReturnStationOperator, t.ReturnStationCapacity, t.ReturnStationXCoordinate, t.ReturnStationYCoordinate order by 1 desc ";
+
+                        cmd1.CommandText = query2;
+
+                        reader = cmd1.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            List<DetailedStation> destinations = new();
+                            while (reader.Read())
+                            {
+                                destinations.Add(new DetailedStation(
+                                    reader.GetInt32(reader.GetOrdinal("ReturnStationId")),
+                                        new Translations(reader.GetString(reader.GetOrdinal("ReturnStationNameFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationNameSwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationNameEng"))),
+                                        new Translations(reader.GetString(reader.GetOrdinal("ReturnStationAddressFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationAddressSwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationAddressFin"))),
+                                        new Translations(reader.GetString(reader.GetOrdinal("ReturnStationCityFin")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationCitySwe")),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationCityFin"))),
+                                        reader.GetString(reader.GetOrdinal("ReturnStationOperator")),
+                                        reader.GetInt32(reader.GetOrdinal("ReturnStationCapacity")),
+                                        reader.GetDecimal(reader.GetOrdinal("ReturnStationXCoordinate")),
+                                        reader.GetDecimal(reader.GetOrdinal("ReturnStationYCoordinate")),
+                                        reader.GetInt32(reader.GetOrdinal("CountTripsStartingFrom"))
+                                    ));
+                            }
+                            details.TopFiveDestinationsFromStation = destinations;
+
+                        }
+                        reader.Close();
+
+                        string query3 = @"select top 5 count(t.DepartureStationId) CountTripsEndingTo, t.DepartureStationId, t.DepartureStationNameFin, "
+                                           + " t.DepartureStationNameSwe, t.DepartureStationNameEng, t.DepartureStationAddressFin, t.DepartureStationAddressSwe, t.DepartureStationCityFin, t.DepartureStationCitySwe, "
+                                           + " t.DepartureStationOperator, t.DepartureStationCapacity, t.DepartureStationXCoordinate, t.DepartureStationYCoordinate "
+                                           + $" from citybike.Trips_v t where t.ReturnStationId = @Id {departureDateFromCondition} {departureDateToCondition} "
+                                           + " GROUP by t.DepartureStationId, t.DepartureStationNameFin, t.DepartureStationNameSwe, t.DepartureStationNameEng, t.DepartureStationAddressFin, t.DepartureStationAddressSwe, "
+                                           + " t.DepartureStationCityFin, t.DepartureStationCitySwe, t.DepartureStationOperator, t.DepartureStationCapacity, t.DepartureStationXCoordinate, t.DepartureStationYCoordinate order by 1 desc ";
+
+                        cmd1.CommandText = query3;
+
+                        reader = cmd1.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            List<DetailedStation> origins = new();
+                            while (reader.Read())
+                            {
+                                origins.Add(new DetailedStation(
+                                reader.GetInt32(reader.GetOrdinal("DepartureStationId")),
+                                    new Translations(reader.GetString(reader.GetOrdinal("DepartureStationNameFin")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationNameSwe")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationNameEng"))),
+                                    new Translations(reader.GetString(reader.GetOrdinal("DepartureStationAddressFin")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationAddressSwe")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationAddressFin"))),
+                                    new Translations(reader.GetString(reader.GetOrdinal("DepartureStationCityFin")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationCitySwe")),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationCityFin"))),
+                                    reader.GetString(reader.GetOrdinal("DepartureStationOperator")),
+                                    reader.GetInt32(reader.GetOrdinal("DepartureStationCapacity")),
+                                    reader.GetDecimal(reader.GetOrdinal("DepartureStationXCoordinate")),
+                                    reader.GetDecimal(reader.GetOrdinal("DepartureStationYCoordinate")),
+                                    reader.GetInt32(reader.GetOrdinal("CountTripsEndingTo"))
+                                ));
+                            }
+                            details.TopFiveOriginsToStation = origins;
+
+                            reader.Close();
+                            connection.Close();
+                        }
+                    }
+
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return details;
+        }
+
         public PaginatedTrips GetTrips(DateTime? departureDateFrom, DateTime? departureDateTo, string? departureStationName, string? returnStationName, string? sortBy, string? sortDir, int rowsPerPage, int page, string clientLanguage)
         {
             PaginatedTrips data = new();
-            DateTime? departureDateToEnd = null;
+            DateTime departureDateToEnd = new DateTime();
             if (departureDateTo != null)
             {
                 departureDateToEnd = departureDateTo!.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
