@@ -3,30 +3,23 @@ namespace CityBikeAPI.Models
 {
     public class Station
     {
-        public int Id { get; private set; }
-        public string NameFin { get; private set; }
-        public string NameSwe { get; private set; }
-        public string NameEng { get; private set; }
-        public string AddressFin { get; private set; }
-        public string AddressSwe { get; private set; }
-        public string CityFin { get; private set; }
-        public string CitySwe { get; private set; }
-        public string Operator { get; private set; }
-        public int Capacity { get; private set; }
-        public decimal XCoordinate { get; private set; }
-        public decimal YCoordinate { get; private set; }
+        public int Id { get; set; }
+        public Translations Name { get; set; }
+        public Translations Address { get; set; }
+        public Translations City { get; set; }
+        public string Operator { get; set; }
+        public int Capacity { get; set; }
+        public decimal XCoordinate { get; set; }
+        public decimal YCoordinate { get; set; }
 
 
-        public Station(int _id, string _nameFin, string _nameSwe, string _nameEng, string _addressFin, string _addressSwe, string _cityFin, string _citySwe, string _operator, int _capacity, decimal _xCoordinate, decimal _yCoordinate)
+        public Station(int _id, Translations _name, Translations _address, Translations _city, string _operator, int _capacity, decimal _xCoordinate, decimal _yCoordinate)
+
         {
             Id = _id;
-            NameFin = _nameFin;
-            NameSwe = _nameSwe;
-            NameEng = _nameEng;
-            AddressFin = _addressFin;
-            AddressSwe = _addressSwe;
-            CityFin = _cityFin;
-            CitySwe = _citySwe;
+            Name = _name;
+            Address = _address;
+            City = _city;
             Operator = _operator;
             Capacity = _capacity;
             XCoordinate = _xCoordinate;

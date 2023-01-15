@@ -15,13 +15,21 @@ const emptyData = {
 
 const emptyDialog = {
      id: null,
-     nameFin: "",
-     nameSwe: "",
-     nameEng: "",
-     addressFin: "",
-     addressSwe: "",
-     cityFin: "",
-     citySwe: "",
+     name: {
+          fin: "",
+          swe: "",
+          eng: "",
+     },
+     address: {
+          fin: "",
+          swe: "",
+          eng: "",
+     },
+     city: {
+          fin: "",
+          swe: "",
+          eng: "",
+     },
      operator: "",
      capacity: null,
      xCoordinate: null,
@@ -61,27 +69,6 @@ function updateQueryParams(queryParams, action) {
      }
 }
 
-const stationNameCol = (language) => {
-     switch (language) {
-          case "swe":
-               return "nameSwe";
-          case "eng":
-               return "nameEng";
-          default:
-               return "nameFin";
-     }
-};
-
-const stationAddressCol = (language) => {
-     if (language === "swe") return "addressSwe";
-     return "addressFin";
-};
-
-const stationCityCol = (language) => {
-     if (language === "swe") return "citySwe";
-     return "cityFin";
-};
-
 export default function StationsTable() {
      const { language } = useLanguageContext();
      const [stations, setStations] = useState(emptyData);
@@ -90,10 +77,43 @@ export default function StationsTable() {
      const [dialogOpen, setDialogOpen] = useState(false);
      const [stationInDialog, setStationInDialog] = useState(emptyDialog);
 
+     const getStationName = (params) => {
+          return params.row?.name[language];
+     };
+
+     const getStationAddress = (params) => {
+          return params.row?.address[language];
+     };
+
+     const getStationCity = (params) => {
+          return params.row?.city[language];
+     };
+
      const dataGridColumns = [
-          { field: stationNameCol(language), headerName: translations.stationName[language], flex: 2, hideable: false, filterable: false },
-          { field: stationAddressCol(language), headerName: translations.stationAddress[language], flex: 2, hideable: false, filterable: false },
-          { field: stationCityCol(language), headerName: translations.city[language], width: 120, hideable: false, filterable: false },
+          {
+               field: "name",
+               valueGetter: (params) => getStationName(params),
+               headerName: translations.stationName[language],
+               flex: 2,
+               hideable: false,
+               filterable: false,
+          },
+          {
+               field: "address",
+               valueGetter: (params) => getStationAddress(params),
+               headerName: translations.stationAddress[language],
+               flex: 2,
+               hideable: false,
+               filterable: false,
+          },
+          {
+               field: "city",
+               valueGetter: (params) => getStationCity(params),
+               headerName: translations.city[language],
+               width: 120,
+               hideable: false,
+               filterable: false,
+          },
           { field: "operator", headerName: translations.operator[language], width: 150, hideable: false, filterable: false },
           { field: "capacity", headerName: translations.capacity[language], width: 100, hideable: false, filterable: false, type: "number" },
      ];
@@ -213,7 +233,6 @@ export default function StationsTable() {
                     dialogOpen={dialogOpen}
                     stationInDialog={stationInDialog}
                     handleCloseDialog={handleCloseDialog}
-                    translations={translations}
                />
           </>
      );

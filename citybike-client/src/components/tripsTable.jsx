@@ -19,6 +19,21 @@ const emptyDialog = {
      returnDate: "",
      departureStation: {
           id: 28,
+          name: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
+          address: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
+          city: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
           nameFin: "",
           nameSwe: "",
           nameEng: "",
@@ -33,6 +48,21 @@ const emptyDialog = {
      },
      returnStation: {
           id: null,
+          name: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
+          address: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
+          city: {
+               fin: "",
+               swe: "",
+               eng: "",
+          },
           nameFin: "",
           nameSwe: "",
           nameEng: "",
@@ -98,18 +128,9 @@ export default function TripsTable() {
      const [dialogOpen, setDialogOpen] = useState(false);
      const [tripInDialog, setTripInDialog] = useState(emptyDialog);
 
-     const stationNameCol = (params, type) => {
-          switch (language) {
-               case "swe":
-                    if (type === "departure") return params.row?.departureStation?.nameSwe;
-                    return params.row?.returnStation?.nameSwe;
-               case "eng":
-                    if (type === "departure") return params.row?.departureStation?.nameEng;
-                    return params.row?.returnStation?.nameEng;
-               default:
-                    if (type === "departure") return params.row?.departureStation?.nameFin;
-                    return params.row?.returnStation?.nameFin;
-          }
+     const getStationName = (params, type) => {
+          if (type === "departure") return params.row?.departureStation?.name[language];
+          return params.row?.returnStation?.name[language];
      };
 
      const dateColFormatter = (params, type) => {
@@ -150,7 +171,7 @@ export default function TripsTable() {
           },
           {
                field: "departureStation",
-               valueGetter: (params) => stationNameCol(params, "departure"),
+               valueGetter: (params) => getStationName(params, "departure"),
                headerName: translations.departureStationName[language],
                flex: 2,
                hideable: false,
@@ -167,7 +188,7 @@ export default function TripsTable() {
           },
           {
                field: "returnStation",
-               valueGetter: (params) => stationNameCol(params, "return"),
+               valueGetter: (params) => getStationName(params, "return"),
                headerName: translations.returnStationName[language],
                flex: 2,
                hideable: false,

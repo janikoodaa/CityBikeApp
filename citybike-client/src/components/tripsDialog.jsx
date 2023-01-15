@@ -10,22 +10,11 @@ export default function TripsDialog(props) {
      const { dialogOpen, tripInDialog, handleCloseDialog } = props;
      const { language } = useLanguageContext();
 
-     const getDialogHeader = () => {
-          switch (language) {
-               case "swe":
-                    return `${tripInDialog.departureStation.nameSwe} - ${tripInDialog.returnStation.nameSwe}`;
-               case "eng":
-                    return `${tripInDialog.departureStation.nameEng} - ${tripInDialog.returnStation.nameEng}`;
-               default:
-                    return `${tripInDialog.departureStation.nameFin} - ${tripInDialog.returnStation.nameFin}`;
-          }
-     };
-
      return (
           <CityBikeDialog
                dialogOpen={dialogOpen}
                handleCloseDialog={handleCloseDialog}
-               title={getDialogHeader()}
+               title={`${tripInDialog.departureStation.name[language]} - ${tripInDialog.returnStation.name[language]}`}
           >
                <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: ".5em" }}>
                     <Tabs

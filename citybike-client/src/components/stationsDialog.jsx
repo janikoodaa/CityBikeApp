@@ -19,35 +19,6 @@ export default function StationsDialog(props) {
      const [dialogTab, setDialogTab] = useState(0);
      const { language } = useLanguageContext();
 
-     const getDialogHeader = () => {
-          switch (language) {
-               case "swe":
-                    return stationInDialog.nameSwe;
-               case "eng":
-                    return stationInDialog.nameEng;
-               default:
-                    return stationInDialog.nameFin;
-          }
-     };
-
-     const getAddressTranslation = () => {
-          switch (language) {
-               case "swe":
-                    return stationInDialog.addressSwe;
-               default:
-                    return stationInDialog.addressFin;
-          }
-     };
-
-     const getCityTranslation = () => {
-          switch (language) {
-               case "swe":
-                    return stationInDialog.citySwe;
-               default:
-                    return stationInDialog.cityFin;
-          }
-     };
-
      const handleDialogTabChange = (event, newValue) => {
           setDialogTab(newValue);
      };
@@ -60,7 +31,7 @@ export default function StationsDialog(props) {
           <CityBikeDialog
                dialogOpen={dialogOpen}
                handleCloseDialog={handleCloseDialog}
-               title={getDialogHeader()}
+               title={stationInDialog.name[language]}
           >
                <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: ".5em" }}>
                     <Tabs
@@ -79,6 +50,7 @@ export default function StationsDialog(props) {
                          divider={<Divider orientation="horizontal" />}
                     >
                          <Typography sx={{ marginTop: "1em", marginBottom: "1em" }}>Aseman perustietoja</Typography>
+                         {import.meta.env.DEV ? <div style={{ color: "red" }}>For dev, station id: {stationInDialog.id}</div> : null}
                          <Grid container>
                               <Grid
                                    item
@@ -90,7 +62,7 @@ export default function StationsDialog(props) {
                                    item
                                    xs={8}
                               >
-                                   <Typography>{getAddressTranslation()}</Typography>
+                                   <Typography>{stationInDialog.address[language]}</Typography>
                               </Grid>
                          </Grid>
                          <Grid container>
@@ -104,7 +76,7 @@ export default function StationsDialog(props) {
                                    item
                                    xs={8}
                               >
-                                   <Typography>{getCityTranslation()}</Typography>
+                                   <Typography>{stationInDialog.city[language]}</Typography>
                               </Grid>
                          </Grid>
                          <Grid container>
@@ -141,10 +113,7 @@ export default function StationsDialog(props) {
                     <div>Statistiikkaa tänne</div>
                </div>
                <div hidden={dialogTab !== 2}>
-                    <StationsOnMap
-                         markerOne={{ xCoordinate: stationInDialog.xCoordinate, yCoordinate: stationInDialog.yCoordinate }}
-                         // markerTwo={{ xCoordinate: "24.8559544008311", yCoordinate: "60.2071192920000" }}
-                    />
+                    <StationsOnMap markerOne={{ xCoordinate: stationInDialog.xCoordinate, yCoordinate: stationInDialog.yCoordinate }} />
                </div>
           </CityBikeDialog>
      );
