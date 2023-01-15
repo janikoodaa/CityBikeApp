@@ -9,3 +9,7 @@ div.footer {
      left: 0;
      right: 0;
 }
+
+.MuiDataGrid-cell:focus {
+     outline: none !important;
+}
