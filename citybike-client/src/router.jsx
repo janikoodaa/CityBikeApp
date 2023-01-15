@@ -1,7 +1,5 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-// import ErrorPage from "./errorPage";
-// import NotFoundPage from "./notFoundPage";
 import Root from "./routes/root";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";

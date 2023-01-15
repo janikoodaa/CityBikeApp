@@ -4,39 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import TripsFilter from "./tripsFilter";
 import TripsDialog from "./tripsDialog";
-
-const translations = {
-     departureStationName: {
-          fin: "Lähtöasema",
-          swe: "Avgång station",
-          eng: "Departure station",
-     },
-     returnStationName: {
-          fin: "Paluuasema",
-          swe: "Återkomst station",
-          eng: "Return station",
-     },
-     departureDate: {
-          fin: "Lähtö",
-          swe: "Avgång",
-          eng: "Departure",
-     },
-     returnDate: {
-          fin: "Paluu",
-          swe: "Återkomst",
-          eng: "Return",
-     },
-     duration: {
-          fin: "Kesto (min)",
-          swe: "Längd (min)",
-          eng: "Duration (min)",
-     },
-     distance: {
-          fin: "Matka (km)",
-          swe: "Distans (km)",
-          eng: "Distance (km)",
-     },
-};
+import translations from "../translations.json";
 
 const emptyData = {
      rowsFrom: 0,

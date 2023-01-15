@@ -1,18 +1,6 @@
 import Typography from "@mui/material/Typography";
 import { useLanguageContext } from "../context/languageContext";
-
-const translations = {
-     note: {
-          fin: "* Todellinen ajettu reitti ei ole tiedossa. Kartalla näkyy Google Mapsin reittiehdotukset alku- ja loppupisteiden perusteella.",
-          swe: "* Den faktiska resvägen är okänd. Kartan visar Google Maps ruttförslag baserat på start- och slutpunkter.",
-          eng: "* The actual ridden route is unknown. Map is showing suggested routes base on start and finish points.",
-     },
-     noApiKeyMessage: {
-          fin: "* Google Maps Platformin API key puuttuu. Kartta on vain mallina ja se näyttää aina samaa paikkaa.",
-          swe: "* Google Maps Platformens API key saknas. Kartan är endast för illustration och den visar alltid samma plats.",
-          eng: "* Google Maps Platform's API key missing. The map is only for illustration and it always shows the same place.",
-     },
-};
+import translations from "../translations.json";
 
 export default function StationsOnMap(props) {
      const { markerOne, markerTwo } = props;
@@ -32,7 +20,7 @@ export default function StationsOnMap(props) {
                          allowFullScreen
                          src={url}
                     ></iframe>
-                    <Typography>{translations.noApiKeyMessage[language]}</Typography>
+                    <Typography>{translations.mapNoApiKeyMessage[language]}</Typography>
                </>
           );
      }
@@ -56,7 +44,7 @@ export default function StationsOnMap(props) {
                     allowFullScreen
                     src={url}
                ></iframe>
-               {markerTwo ? <Typography>{translations.note[language]}</Typography> : null}
+               {markerTwo ? <Typography>{translations.mapNote[language]}</Typography> : null}
           </>
      );
 }

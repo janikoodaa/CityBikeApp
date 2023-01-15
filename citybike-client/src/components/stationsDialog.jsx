@@ -12,9 +12,10 @@ import Divider from "@mui/material/Divider";
 import { useEffect, useState } from "react";
 import { useLanguageContext } from "../context/languageContext";
 import CityBikeDialog from "./cityBikeDialog";
+import translations from "../translations.json";
 
 export default function StationsDialog(props) {
-     const { dialogOpen, stationInDialog, handleCloseDialog, translations } = props;
+     const { dialogOpen, stationInDialog, handleCloseDialog } = props;
      const [dialogTab, setDialogTab] = useState(0);
      const { language } = useLanguageContext();
 
@@ -26,6 +27,24 @@ export default function StationsDialog(props) {
                     return stationInDialog.nameEng;
                default:
                     return stationInDialog.nameFin;
+          }
+     };
+
+     const getAddressTranslation = () => {
+          switch (language) {
+               case "swe":
+                    return stationInDialog.addressSwe;
+               default:
+                    return stationInDialog.addressFin;
+          }
+     };
+
+     const getCityTranslation = () => {
+          switch (language) {
+               case "swe":
+                    return stationInDialog.citySwe;
+               default:
+                    return stationInDialog.cityFin;
           }
      };
 
@@ -71,7 +90,7 @@ export default function StationsDialog(props) {
                                    item
                                    xs={8}
                               >
-                                   <Typography>{stationInDialog.addressFin}</Typography>
+                                   <Typography>{getAddressTranslation()}</Typography>
                               </Grid>
                          </Grid>
                          <Grid container>
@@ -85,7 +104,7 @@ export default function StationsDialog(props) {
                                    item
                                    xs={8}
                               >
-                                   <Typography>{stationInDialog.cityFin}</Typography>
+                                   <Typography>{getCityTranslation()}</Typography>
                               </Grid>
                          </Grid>
                          <Grid container>

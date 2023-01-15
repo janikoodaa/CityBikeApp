@@ -4,34 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import StationsFilter from "./stationsFilter";
 import StationsDialog from "./stationsDialog";
-
-const translations = {
-     stationName: {
-          fin: "Aseman nimi",
-          swe: "Station namn",
-          eng: "Station name",
-     },
-     stationAddress: {
-          fin: "Osoite",
-          swe: "Adress",
-          eng: "Address",
-     },
-     city: {
-          fin: "Kaupunki",
-          swe: "Stad",
-          eng: "City",
-     },
-     operator: {
-          fin: "Operaattori",
-          swe: "Operator",
-          eng: "Operator",
-     },
-     capacity: {
-          fin: "Kapasiteetti",
-          swe: "Kapasitet",
-          eng: "Capacity",
-     },
-};
+import translations from "../translations.json";
 
 const emptyData = {
      rowsFrom: 0,
@@ -118,7 +91,7 @@ export default function StationsTable() {
      const [stationInDialog, setStationInDialog] = useState(emptyDialog);
 
      const dataGridColumns = [
-          { field: stationNameCol(language), headerName: translations.stationName[language], width: 200, hideable: false, filterable: false },
+          { field: stationNameCol(language), headerName: translations.stationName[language], flex: 2, hideable: false, filterable: false },
           { field: stationAddressCol(language), headerName: translations.stationAddress[language], flex: 2, hideable: false, filterable: false },
           { field: stationCityCol(language), headerName: translations.city[language], width: 120, hideable: false, filterable: false },
           { field: "operator", headerName: translations.operator[language], width: 150, hideable: false, filterable: false },
@@ -164,7 +137,7 @@ export default function StationsTable() {
 
           const controller = new AbortController();
           const signal = controller.signal;
-          let headers = { clientLanguage: language, "Access-Control-Allow-Headers": "Accept" };
+          let headers = { clientLanguage: language };
           let endpoint =
                `${import.meta.env.VITE_BACKEND_URL}stations/list?name=${queryParams.name}&address=${queryParams.address}` +
                `&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}` +

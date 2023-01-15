@@ -11,34 +11,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import dayjs from "dayjs";
-
-const translations = {
-     departureStationName: {
-          fin: "Lähtöasema",
-          swe: "Avgång station",
-          eng: "Departure station",
-     },
-     returnStationName: {
-          fin: "Paluuasema",
-          swe: "Återkomst station",
-          eng: "Return station",
-     },
-     departureDateFrom: {
-          fin: "Lähtö, alkaen",
-          swe: "Avgång, från",
-          eng: "Departure, from",
-     },
-     departureDateTo: {
-          fin: "Lähtö, päättyen",
-          swe: "Avgång, till",
-          eng: "Departure, to",
-     },
-     clearButtonTooltip: {
-          fin: "Tyhjennä filtterit",
-          swe: "Klara filtren",
-          eng: "Clear filters",
-     },
-};
+import translations from "../translations.json";
 
 const onKeyDown = (e) => {
      e.preventDefault();

@@ -7,29 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import BackspaceOutlinedIcon from "@mui/icons-material/BackspaceOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import { useLanguageContext } from "../context/languageContext";
-
-const translations = {
-     stationName: {
-          fin: "Aseman nimi",
-          swe: "Station namn",
-          eng: "Station name",
-     },
-     stationAddress: {
-          fin: "Osoite",
-          swe: "Adress",
-          eng: "Address",
-     },
-     city: {
-          fin: "Kaupunki",
-          swe: "Stad",
-          eng: "City",
-     },
-     clearButtonTooltip: {
-          fin: "Tyhjennä filtterit",
-          swe: "Klara filtren",
-          eng: "Clear filters",
-     },
-};
+import translations from "../translations.json";
 
 export default function StationsFilter(props) {
      const { queryParams, dispatchQueryParams, ACTION_TYPES } = props;
