@@ -48,7 +48,7 @@ const ACTION_TYPES = Object.freeze({
 function updateQueryParams(queryParams, action) {
      switch (action.type) {
           case ACTION_TYPES.UPDATE_FILTER_MODEL: {
-               return { ...queryParams, name: action.payload.name, address: action.payload.address, city: action.payload.city };
+               return { ...queryParams, name: action.payload.name, address: action.payload.address, city: action.payload.city, page: 0 };
           }
           case ACTION_TYPES.UPDATE_SORT_MODEL:
                return { ...queryParams, sortBy: action.payload.field, sortDir: action.payload.sort };
