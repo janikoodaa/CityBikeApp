@@ -1,4 +1,14 @@
 {
+     "averageDistanceFromStation": {
+          "fin": "Tältä asemalta tehtyjen matkojen keskipituus, km",
+          "swe": "Genomsnittligt avstånd för en resa med start från denna station, km",
+          "eng": "Average distance of a trip starting from this station, km"
+     },
+     "averageDistanceToStation": {
+          "fin": "Tälle asemalle tehtyjen matkojen keskipituus, km",
+          "swe": "Genomsnittligt avstånd för en resa som slutar till denna station, km",
+          "eng": "Average distance of a trip ending to this station, km"
+     },
      "capacity": {
           "fin": "Kapasiteetti",
           "swe": "Kapasitet",
@@ -88,6 +98,31 @@
           "fin": "Aseman nimi",
           "swe": "Station namn",
           "eng": "Station name"
+     },
+     "topDestinationsFromStation": {
+          "fin": "Minne tältä asemalta mennään yleisimmin",
+          "swe": "De vanligaste destinationerna från denna station",
+          "eng": "The most common destinations from this station"
+     },
+     "topOriginsToStation": {
+          "fin": "Mistä tälle asemalle tullaan yleisimmin",
+          "swe": "Det vanligaste ursprunget till denna station",
+          "eng": "The most common origins to this station"
+     },
+     "trips": {
+          "fin": "matkaa",
+          "swe": "resor",
+          "eng": "trips"
+     },
+     "tripsCountFromStation": {
+          "fin": "Tältä asemalta tehtyjen matkojen määrä",
+          "swe": "Antal resor med start från denna station",
+          "eng": "Count of the trips starting from this station"
+     },
+     "tripsCountToStation": {
+          "fin": "Tälle asemalle tehtyjen matkojen määrä",
+          "swe": "Antal resor som slutar till denna station",
+          "eng": "Count of the trips ending to this station"
      },
      "tripsInfoText1": {
           "fin": "Tällä sivulla näet City Bike -pyörillä tehdyt matkat.",
