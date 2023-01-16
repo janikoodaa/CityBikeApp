@@ -208,7 +208,7 @@ namespace CityBikeAPI.Data
 
                         if (statsTo != null)
                         {
-                            departureDateToCondition = " and t.DepartureDate <= @StatsTo ";
+                            departureDateToCondition = " and t.DepartureDate < @StatsTo ";
                             cmd1.Parameters.Add("StatsTo", SqlDbType.DateTime).Value = statsTo;
                         }
 
@@ -235,8 +235,8 @@ namespace CityBikeAPI.Data
                                 details.StationId = reader.GetInt32(reader.GetOrdinal("Id"));
                                 details.TripsCountFromStation = reader.GetInt32(reader.GetOrdinal("TripsStartingFrom"));
                                 details.TripsCountToStation = reader.GetInt32(reader.GetOrdinal("TripsEndingTo"));
-                                details.AverageDistanceFromStation = reader.GetInt32(reader.GetOrdinal("AvgDistanceStartingFrom"));
-                                details.AverageDistanceToStation = reader.GetInt32(reader.GetOrdinal("AvgDistanceEndingTo"));
+                                details.AverageDistanceFromStation = reader.IsDBNull(reader.GetOrdinal("AvgDistanceStartingFrom")) ? 0 : reader.GetInt32(reader.GetOrdinal("AvgDistanceStartingFrom"));
+                                details.AverageDistanceToStation = reader.IsDBNull(reader.GetOrdinal("AvgDistanceEndingTo")) ? 0 : reader.GetInt32(reader.GetOrdinal("AvgDistanceEndingTo"));
                             }
                         }
                         reader.Close();

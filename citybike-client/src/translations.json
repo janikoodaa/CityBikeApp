@@ -49,6 +49,11 @@
           "swe": "Avgång station",
           "eng": "Departure station"
      },
+     "detailsSwitchLabel": {
+          "fin": "Kuukausinäkymä",
+          "swe": "Månadsvy",
+          "eng": "Monthly view"
+     },
      "distance": {
           "fin": "Matka (km)",
           "swe": "Distans (km)",

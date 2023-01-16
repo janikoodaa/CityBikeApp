@@ -10,10 +10,35 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import LinearProgress from "@mui/material/LinearProgress";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useEffect, useState } from "react";
 import { useLanguageContext } from "../context/languageContext";
 import CityBikeDialog from "./cityBikeDialog";
 import translations from "../translations.json";
+
+const addMonth = (dateIn) => {
+     let dateOut = new Date(dateIn);
+     var d = dateOut.getDate();
+     dateOut.setMonth(dateOut.getMonth() + 1);
+     if (dateOut.getDate() != d) {
+          dateOut.setDate(0);
+     }
+     return dateOut;
+};
+
+const reduceMonth = (dateIn) => {
+     let dateOut = new Date(dateIn);
+     var d = dateOut.getDate();
+     dateOut.setMonth(dateOut.getMonth() - 1);
+     if (dateOut.getDate() != d) {
+          dateOut.setDate(0);
+     }
+     return dateOut;
+};
 
 const emptyStationDetails = {
      stationId: null,
@@ -25,16 +50,38 @@ const emptyStationDetails = {
      topFiveOriginsToStation: [],
 };
 
+const defaultStartDateForDetails = new Date("2021-07");
+
 export default function StationsDialog(props) {
      const { dialogOpen, stationInDialog, handleCloseDialog } = props;
      const [dialogTab, setDialogTab] = useState(0);
      const [stationDetails, setStationDetails] = useState(emptyStationDetails);
+     const [monthlyViewOn, setMonthlyViewOn] = useState(false);
      const [detailsTimeFrame, setDetailsTimeFrame] = useState({ start: null, end: null });
      const [loadingDetails, setLoadingDetails] = useState(false);
      const { language } = useLanguageContext();
 
      const handleDialogTabChange = (event, newValue) => {
           setDialogTab(newValue);
+     };
+
+     const handleMonthlyViewChange = () => {
+          setMonthlyViewOn((prev) => {
+               if (detailsTimeFrame.start === null) {
+                    setDetailsTimeFrame({ start: defaultStartDateForDetails, end: addMonth(defaultStartDateForDetails) });
+               }
+               return !prev;
+          });
+     };
+
+     const handleMonthChange = (operation) => {
+          let current = detailsTimeFrame;
+          if (operation === "forward") {
+               setDetailsTimeFrame({ start: current.end, end: addMonth(current.end) });
+          }
+          if (operation === "back") {
+               setDetailsTimeFrame({ start: reduceMonth(current.start), end: current.start });
+          }
      };
 
      const distanceFormatter = (distance) => {
@@ -48,7 +95,7 @@ export default function StationsDialog(props) {
 
      const TopFiveDestinations = () => {
           return (
-               <ol>
+               <ol className="top-five-list">
                     {stationDetails.topFiveDestinationsFromStation.map((station) => {
                          return <li key={station.id}>{`${station.name[language]} (${station.countOfTrips} ${translations.trips[language]})`}</li>;
                     })}
@@ -58,7 +105,7 @@ export default function StationsDialog(props) {
 
      const TopFiveOrigins = () => {
           return (
-               <ol>
+               <ol className="top-five-list">
                     {stationDetails.topFiveOriginsToStation.map((station) => {
                          return <li key={station.id}>{`${station.name[language]} (${station.countOfTrips} ${translations.trips[language]})`}</li>;
                     })}
@@ -68,6 +115,8 @@ export default function StationsDialog(props) {
 
      useEffect(() => {
           setDialogTab(0);
+          setMonthlyViewOn(false);
+          setDetailsTimeFrame({ start: null, end: null });
      }, [dialogOpen]);
 
      useEffect(() => {
@@ -75,9 +124,13 @@ export default function StationsDialog(props) {
                setLoadingDetails(true);
                const controller = new AbortController();
                const signal = controller.signal;
-               let endpoint = `${import.meta.env.VITE_BACKEND_URL}stations/details/${stationInDialog.id}?statsfrom=${
-                    detailsTimeFrame.start || ""
-               }&statsto=${detailsTimeFrame.end || ""}`;
+               let endpoint = `${import.meta.env.VITE_BACKEND_URL}stations/${stationInDialog.id}/details`;
+
+               if (monthlyViewOn) {
+                    endpoint += `?statsfrom=${detailsTimeFrame.start.toISOString().substring(0, 10) || ""}&statsto=${
+                         detailsTimeFrame.end.toISOString().substring(0, 10) || ""
+                    }`;
+               }
 
                const getData = async () => {
                     try {
@@ -90,8 +143,7 @@ export default function StationsDialog(props) {
                          if (response.status === 200) {
                               let data = await response.json();
                               setStationDetails(data);
-                         }
-                         if (response.status === 404) {
+                         } else {
                               setStationDetails(emptyStationDetails);
                          }
                     } catch (error) {
@@ -109,7 +161,7 @@ export default function StationsDialog(props) {
                     setLoadingDetails(false);
                };
           }
-     }, [stationInDialog.id]);
+     }, [stationInDialog.id, detailsTimeFrame, monthlyViewOn]);
 
      return (
           <CityBikeDialog
@@ -192,99 +244,139 @@ export default function StationsDialog(props) {
                     </Stack>
                </div>
                <div hidden={dialogTab !== 1}>
-                    {loadingDetails ? (
-                         <LinearProgress color="inherit" />
-                    ) : (
-                         <Stack
-                              gap={".5em"}
-                              divider={<Divider orientation="horizontal" />}
+                    {loadingDetails ? <LinearProgress color="inherit" /> : null}
+                    <Stack
+                         gap={".5em"}
+                         divider={<Divider orientation="horizontal" />}
+                    >
+                         <Grid
+                              container
+                              display={"flex"}
+                              sx={{ alignItems: "center", justifyContent: "center" }}
                          >
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={8}
-                                   >
-                                        <Typography variant="subtitle2">{translations.tripsCountFromStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography>{stationDetails.tripsCountFromStation}</Typography>
-                                   </Grid>
+                              <Grid item>
+                                   <FormControlLabel
+                                        control={
+                                             <Switch
+                                                  size="small"
+                                                  checked={monthlyViewOn}
+                                                  onChange={handleMonthlyViewChange}
+                                             />
+                                        }
+                                        label={translations.detailsSwitchLabel[language]}
+                                   />
                               </Grid>
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={8}
+                              <Grid item>
+                                   <IconButton
+                                        disabled={!monthlyViewOn}
+                                        onClick={() => handleMonthChange("back")}
                                    >
-                                        <Typography variant="subtitle2">{translations.tripsCountToStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography>{stationDetails.tripsCountToStation}</Typography>
-                                   </Grid>
+                                        <ArrowBackIosIcon />
+                                   </IconButton>
                               </Grid>
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={8}
-                                   >
-                                        <Typography variant="subtitle2">{translations.averageDistanceFromStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography>{distanceFormatter(stationDetails.averageDistanceFromStation)}</Typography>
-                                   </Grid>
+                              <Grid item>
+                                   <div className={monthlyViewOn ? "month-select-box" : "month-select-box inactive"}>
+                                        <Typography>
+                                             {detailsTimeFrame.start
+                                                  ? `${detailsTimeFrame.start?.getMonth() + 1}/${detailsTimeFrame.start?.getFullYear()}`
+                                                  : ""}
+                                        </Typography>
+                                   </div>
                               </Grid>
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={8}
+                              <Grid item>
+                                   <IconButton
+                                        disabled={!monthlyViewOn}
+                                        onClick={() => handleMonthChange("forward")}
                                    >
-                                        <Typography variant="subtitle2">{translations.averageDistanceToStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography>{distanceFormatter(stationDetails.averageDistanceToStation)}</Typography>
-                                   </Grid>
+                                        <ArrowForwardIosIcon />
+                                   </IconButton>
                               </Grid>
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography variant="subtitle2">{translations.topDestinationsFromStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={8}
-                                   >
-                                        {stationDetails.topFiveDestinationsFromStation[0] ? <TopFiveDestinations /> : null}
-                                   </Grid>
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   <Typography variant="subtitle2">{translations.tripsCountFromStation[language]}</Typography>
                               </Grid>
-                              <Grid container>
-                                   <Grid
-                                        item
-                                        xs={4}
-                                   >
-                                        <Typography variant="subtitle2">{translations.topOriginsToStation[language]}</Typography>
-                                   </Grid>
-                                   <Grid
-                                        item
-                                        xs={8}
-                                   >
-                                        {stationDetails.topFiveOriginsToStation[0] ? <TopFiveOrigins /> : null}
-                                   </Grid>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography>{stationDetails.tripsCountFromStation}</Typography>
                               </Grid>
-                         </Stack>
-                    )}
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   <Typography variant="subtitle2">{translations.tripsCountToStation[language]}</Typography>
+                              </Grid>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography>{stationDetails.tripsCountToStation}</Typography>
+                              </Grid>
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   <Typography variant="subtitle2">{translations.averageDistanceFromStation[language]}</Typography>
+                              </Grid>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography>{distanceFormatter(stationDetails.averageDistanceFromStation)}</Typography>
+                              </Grid>
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   <Typography variant="subtitle2">{translations.averageDistanceToStation[language]}</Typography>
+                              </Grid>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography>{distanceFormatter(stationDetails.averageDistanceToStation)}</Typography>
+                              </Grid>
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography variant="subtitle2">{translations.topDestinationsFromStation[language]}</Typography>
+                              </Grid>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   {stationDetails.topFiveDestinationsFromStation[0] ? <TopFiveDestinations /> : null}
+                              </Grid>
+                         </Grid>
+                         <Grid container>
+                              <Grid
+                                   item
+                                   xs={4}
+                              >
+                                   <Typography variant="subtitle2">{translations.topOriginsToStation[language]}</Typography>
+                              </Grid>
+                              <Grid
+                                   item
+                                   xs={8}
+                              >
+                                   {stationDetails.topFiveOriginsToStation[0] ? <TopFiveOrigins /> : null}
+                              </Grid>
+                         </Grid>
+                    </Stack>
                </div>
                <div hidden={dialogTab !== 2}>
                     <StationsOnMap markerOne={{ xCoordinate: stationInDialog.xCoordinate, yCoordinate: stationInDialog.yCoordinate }} />
