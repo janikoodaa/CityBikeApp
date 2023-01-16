@@ -22,7 +22,7 @@ namespace CityBikeAPI.Controllers
         }
 
         // api/trips lists all trips
-        [HttpGet("list")]
+        [HttpGet()]
         public IActionResult GetTripsList([FromQuery] DateTime? departureDateFrom, [FromQuery] DateTime? departureDateTo, [FromQuery] string? departureStationName, [FromQuery] string? returnStationName, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
             if (rowsPerPage < 1 || rowsPerPage > 500 || page < 0)

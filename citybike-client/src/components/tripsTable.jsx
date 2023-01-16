@@ -257,7 +257,7 @@ export default function TripsTable() {
           let dateFromString = queryParams.departureDateFrom && new Date(queryParams.departureDateFrom)?.toISOString().substring(0, 10);
           let dateToString = queryParams.departureDateTo && new Date(queryParams.departureDateTo)?.toISOString().substring(0, 10);
           let endpoint =
-               `${import.meta.env.VITE_BACKEND_URL}trips/list?departureDateFrom=${dateFromString || ""}` +
+               `${import.meta.env.VITE_BACKEND_URL}trips?departureDateFrom=${dateFromString || ""}` +
                `&departureDateTo=${dateToString || ""}&departurestationname=${queryParams.departureStation}` +
                `&returnstationname=${queryParams.returnStation}&sortby=${queryParams.sortBy}` +
                `&sortdir=${queryParams.sortDir}&rowsPerPage=${queryParams.rowsPerPage}&page=${queryParams.page}`;

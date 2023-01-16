@@ -159,7 +159,7 @@ export default function StationsTable() {
           const signal = controller.signal;
           let headers = { clientLanguage: language };
           let endpoint =
-               `${import.meta.env.VITE_BACKEND_URL}stations/list?name=${queryParams.name}&address=${queryParams.address}` +
+               `${import.meta.env.VITE_BACKEND_URL}stations?name=${queryParams.name}&address=${queryParams.address}` +
                `&city=${queryParams.city}&sortby=${queryParams.sortBy}&sortdir=${queryParams.sortDir}` +
                `&rowsperpage=${queryParams.rowsPerPage}&page=${queryParams.page}`;
 
