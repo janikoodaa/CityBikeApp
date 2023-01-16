@@ -175,8 +175,7 @@ export default function StationsTable() {
                     if (response.status === 200) {
                          let data = await response.json();
                          setStations(data);
-                    }
-                    if (response.status === 404) {
+                    } else {
                          setStations(emptyData);
                     }
                } catch (error) {

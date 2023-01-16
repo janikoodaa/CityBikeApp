@@ -273,8 +273,7 @@ export default function TripsTable() {
                     if (response.status === 200) {
                          let data = await response.json();
                          setTrips(data);
-                    }
-                    if (response.status === 404) {
+                    } else {
                          setTrips(emptyData);
                     }
                } catch (error) {
