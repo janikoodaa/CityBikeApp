@@ -73,8 +73,27 @@ AS
     from [citybike].[Stations] s;
 GO
 
+CREATE PROCEDURE [citybike].[InsertNewTrip]
+    @departure_date datetime,
+    @return_date datetime,
+    @departure_station_id int,
+    @return_station_id int,
+    @distance int,
+    @duration int
+as
+insert into citybike.Trips
+    (DepartureDate, ReturnDate, DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
+OUTPUT
+inserted.Id
+VALUES
+    (@departure_date, @return_date, @departure_station_id, @return_station_id, @distance, @duration);
+GO
+
 GRANT SELECT ON [citybike].[Trips_v] TO citybikeapp;
 GO
 
 GRANT SELECT ON [citybike].[Stations_v] TO citybikeapp;
+GO
+
+GRANT EXECUTE on [citybike].[InsertNewTrip] TO citybikeapp;
 GO

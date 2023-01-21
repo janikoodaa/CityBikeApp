@@ -8,7 +8,8 @@ Data validation rules:
 - In the Stations-data FID-column is not inserted, as it doesn't seem necessary.
 - In the Trips-data, if departure or return date doesn't contain correct date and time, row is not inserted.
 - In the Trips-data, departure- and return station ids are checked to be in Stations-data, if not, row is not inserted.
-- In the Trips-data, if covered distance < 10 m and/or duration < 10 s, row is not inserted.
+- In the Trips-data, if covered distance < 10 m and/or calculated duration < 10 s, row is not inserted.
+  (the given duration is not used, instead it calculated from departure and return times)
 - In the Trips-data the departure- and return station's names are not inserted. Instead, there's foreign key reference to Stations-table by station ids.
 */
 
@@ -32,13 +33,14 @@ GO
 
 INSERT into citybike.Trips
     (DepartureDate, ReturnDate, DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
-select distinct t.DepartureDate, t.ReturnDate, t.DepartureStationId, t.ReturnStationId, t.CoveredDistance CoveredDistanceInMeters, t.Duration DurationInSeconds
+select distinct t.DepartureDate, t.ReturnDate, t.DepartureStationId, t.ReturnStationId, t.CoveredDistance CoveredDistanceInMeters,
+    datediff(s, t.DepartureDate, t.ReturnDate) DurationInSeconds
 from (
-                                                                                                                            select
+                                select
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-05a.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -52,7 +54,7 @@ from (
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-05b.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -66,7 +68,7 @@ from (
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-06a.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -80,7 +82,7 @@ from (
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-06b.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -94,7 +96,7 @@ from (
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-07a.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -108,7 +110,7 @@ from (
             case when isdate(right(a.[Departure], 19)) = 1 then cast(right(a.[Departure], 19) as datetime2) end DepartureDate,
             case when isdate(right(a.[Return], 19)) = 1 then cast(right(a.[Return], 19) as datetime2) end ReturnDate,
             cast(a.[Departure station id] as int) DepartureStationId, cast(a.[Return station id] as int) ReturnStationId,
-            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance, cast(a.[Duration (sec.)] as int) Duration
+            cast(round(cast(a.[Covered distance (m)] as decimal(12,4)),0) as int) CoveredDistance
         from openrowset(
     BULK '\var\opt\DataToImport\2021-07b.csv',
         formatfile='\var\opt\DataToImport\TripsFormat.xml',
@@ -120,8 +122,8 @@ from (
 ) t
 where t.DepartureDate is not null
     and t.ReturnDate is not null
+    and datediff(s, t.DepartureDate, t.ReturnDate) > 10
     and t.CoveredDistance >= 10
-    and t.Duration >= 10
     and t.DepartureStationId in (select distinct s.Id
     from citybike.Stations s)
     and t.ReturnStationId in (select distinct s.Id
