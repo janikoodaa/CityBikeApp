@@ -584,5 +584,42 @@ namespace CityBikeAPI.Data
             }
         }
 
+        public int InsertNewTrip(NewTripIn trip)
+        {
+            int createdTrip;
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("CityBikeDB")))
+                {
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.Connection = connection;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.CommandText = "citybike.InsertNewTrip";
+
+                        cmd.Parameters.Add("departure_date", SqlDbType.DateTime).Value = trip.DepartureDate;
+                        cmd.Parameters.Add("return_date", SqlDbType.DateTime).Value = trip.ReturnDate;
+                        cmd.Parameters.Add("departure_station_id", SqlDbType.Int).Value = trip.DepartureStationId;
+                        cmd.Parameters.Add("return_station_id", SqlDbType.Int).Value = trip.ReturnStationId;
+                        cmd.Parameters.Add("distance", SqlDbType.Int).Value = trip.DistanceMeters;
+                        cmd.Parameters.Add("duration", SqlDbType.Int).Value = trip.DurationSeconds;
+                        SqlParameter newId = new SqlParameter("new_id", SqlDbType.Int);
+                        newId.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(newId);
+
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                        createdTrip = (int)newId.Value;
+                    }
+                    connection.Close();
+                }
+                return createdTrip;
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

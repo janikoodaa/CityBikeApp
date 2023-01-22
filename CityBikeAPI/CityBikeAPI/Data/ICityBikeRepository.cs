@@ -13,6 +13,9 @@ namespace CityBikeAPI.Data
 
         // List of trips
         PaginatedTrips GetTrips(DateTime? departureDateFrom, DateTime? departureDateTo, string? departureStationName, string? returnStationName, string? sortBy, string? sortDir, int rowsPerPage, int page, string language);
+
+        // Insert new trip to database
+        int InsertNewTrip(NewTripIn trip);
     }
 }
 
