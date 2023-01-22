@@ -27,13 +27,13 @@ namespace CityBikeAPI.Controllers
         /// Returns object with pagination info and array of stations by given parameters.
         /// </summary>
         /// <param name="name" example="kis">Optional: Station name or part of it.</param>
-        /// <param name="address" example="mann">Station address or part of it.</param>
-        /// <param name="city" example="hel">City name or part of it.</param>
-        /// <param name="sortBy" example="address">Column name on which the sorting will be applied.</param>
-        /// <param name="sortDir" example="asc">Sorting direction, "asc" or "desc"</param>
-        /// <param name="rowsPerPage" example="100">Rows per page</param>
-        /// <param name="page" example="0">Zero based page number.</param>
-        /// <param name="clientLanguage" example="fin">Allowed values are "fin", "swe" and "eng".</param>
+        /// <param name="address" example="mann">Optional: Station address or part of it.</param>
+        /// <param name="city" example="hel">Optional: City name or part of it.</param>
+        /// <param name="sortBy" example="address">Optional: Column name on which the sorting will be applied. Defaults to name.</param>
+        /// <param name="sortDir" example="asc">Optional: Sorting direction, "asc" or "desc". Defaults to asc.</param>
+        /// <param name="rowsPerPage" example="100">Required: Rows per page</param>
+        /// <param name="page" example="0">Required: Zero based page number.</param>
+        /// <param name="clientLanguage" example="fin">Required: Allowed values are "fin", "swe" and "eng".</param>
         /// <response code="200">PaginatedStations-object with array of stations</response>
         /// <response code="404">PaginatedStations-object with empty array of stations</response>
         /// <response code="500">Unexpected error</response>
