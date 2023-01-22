@@ -79,14 +79,17 @@ CREATE PROCEDURE [citybike].[InsertNewTrip]
     @departure_station_id int,
     @return_station_id int,
     @distance int,
-    @duration int
+    @duration int,
+    @new_id int output
 as
-insert into citybike.Trips
-    (DepartureDate, ReturnDate, DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
-OUTPUT
-inserted.Id
-VALUES
-    (@departure_date, @return_date, @departure_station_id, @return_station_id, @distance, @duration);
+BEGIN
+    SET NOCOUNT ON;
+    insert into citybike.Trips
+        (DepartureDate, ReturnDate, DepartureStationId, ReturnStationId, CoveredDistanceInMeters, DurationInSeconds)
+    VALUES
+        (@departure_date, @return_date, @departure_station_id, @return_station_id, @distance, @duration);
+    set @new_id=SCOPE_IDENTITY();
+END
 GO
 
 GRANT SELECT ON [citybike].[Trips_v] TO citybikeapp;
