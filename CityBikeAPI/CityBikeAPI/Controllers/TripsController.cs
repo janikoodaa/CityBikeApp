@@ -24,21 +24,24 @@ namespace CityBikeAPI.Controllers
         }
 
         /// <summary>
-        /// Get request to api/trips. stationName-queries depend on clientLanguage (fin, swe, eng) parameter, which should be included in request headers. If omitted, query is made using default language (fin).
-        /// For pagination to work, rowsPerPage and page are mandatory params.
-        /// Returns IActionResult with instance of PaginatedTrips-class, if no exception is caught.
+        /// Returns object with pagination info and array of trips by given parameters.
         /// </summary>
-        /// <param name="departureDateFrom"></param>
-        /// <param name="departureDateTo"></param>
-        /// <param name="departureStationName"></param>
-        /// <param name="returnStationName"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortDir"></param>
-        /// <param name="rowsPerPage"></param>
-        /// <param name="page"></param>
-        /// <param name="clientLanguage"></param>
-        /// <returns></returns>
+        /// <param name="departureDateFrom" example="2021-06-01">Earliest departure date</param>
+        /// <param name="departureDateTo" example="2021-06-04">Latest departure date</param>
+        /// <param name="departureStationName" example="aalto">Departure station name or part of it</param>
+        /// <param name="returnStationName" example="aalto">Return station name or part of it</param>
+        /// <param name="sortBy" example="address">Column name on which the sorting will be applied.</param>
+        /// <param name="sortDir" example="asc">Sorting direction, "asc" or "desc"</param>
+        /// <param name="rowsPerPage" example="100">Rows per page</param>
+        /// <param name="page" example="0">Zero based page number.</param>
+        /// <param name="clientLanguage" example="fin">Allowed values are "fin", "swe" and "eng".</param>
+        /// <response code="200">PaginatedTrips-object with array of trips</response>
+        /// <response code="404">PaginatedTrips-object with empty array of trips</response>
+        /// <response code="500">Unexpected error</response>
         [HttpGet()]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public IActionResult GetTripsList([FromQuery] DateTime? departureDateFrom, [FromQuery] DateTime? departureDateTo, [FromQuery] string? departureStationName, [FromQuery] string? returnStationName, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
             if (rowsPerPage < 1 || rowsPerPage > 500 || page < 0)
@@ -66,7 +69,10 @@ namespace CityBikeAPI.Controllers
         }
 
         /// <summary>
-        /// Post request to api/trips. Request body must contain NewTripIn-object, example below.
+        /// Creates a new trip to database.
+        /// </summary>
+        /// <remarks>
+        /// Sample request body:
         /// {
         ///    "departureDate": "2023-01-20T12:00:00",
         ///    "returnDate": "2023-01-20T12:00:19",
@@ -75,11 +81,15 @@ namespace CityBikeAPI.Controllers
         ///    "distanceMeters": 10,
         ///    "durationSeconds": 19
         /// }
-        /// Return IActionResult with just created trip id, if no exception is caught.
-        /// </summary>
-        /// <param name="trip"></param>
-        /// <returns></returns>
+        /// </remarks>
+        /// <param name="trip">Mandatory trip properties in request body</param>
+        /// <response code="201">Created trip id</response>
+        /// <response code="400">Model validation or foreign key error</response>
+        /// <response code="500">Unexpected error</response>
         [HttpPost()]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public IActionResult PostNewTrip([FromBody] NewTripIn trip)
         {
             int newTripId;

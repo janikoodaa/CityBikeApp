@@ -24,20 +24,23 @@ namespace CityBikeAPI.Controllers
         }
 
         /// <summary>
-        /// Get request to api/stations. name-, address-, and city-queries depend on clientLanguage (fin, swe, eng) parameter, which should be included in request headers. If omitted, query is made using default language (fin).
-        /// For pagination to work, rowsPerPage and page are mandatory params.
-        /// Returns IActionResult with instance of PaginatedStations-class, if no exception is caught.
+        /// Returns object with pagination info and array of stations by given parameters.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="address"></param>
-        /// <param name="city"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortDir"></param>
-        /// <param name="rowsPerPage"></param>
-        /// <param name="page"></param>
-        /// <param name="clientLanguage"></param>
-        /// <returns></returns>
+        /// <param name="name" example="kis">Optional: Station name or part of it.</param>
+        /// <param name="address" example="mann">Station address or part of it.</param>
+        /// <param name="city" example="hel">City name or part of it.</param>
+        /// <param name="sortBy" example="address">Column name on which the sorting will be applied.</param>
+        /// <param name="sortDir" example="asc">Sorting direction, "asc" or "desc"</param>
+        /// <param name="rowsPerPage" example="100">Rows per page</param>
+        /// <param name="page" example="0">Zero based page number.</param>
+        /// <param name="clientLanguage" example="fin">Allowed values are "fin", "swe" and "eng".</param>
+        /// <response code="200">PaginatedStations-object with array of stations</response>
+        /// <response code="404">PaginatedStations-object with empty array of stations</response>
+        /// <response code="500">Unexpected error</response>
         [HttpGet()]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public IActionResult GetStationsList([FromQuery] string? name, [FromQuery] string? address, [FromQuery] string? city, [FromQuery] string? sortBy, [FromQuery] string? sortDir, [FromQuery] int rowsPerPage, [FromQuery] int page, [FromHeader] string clientLanguage)
         {
             if (rowsPerPage < 1 || rowsPerPage > 500 || page < 0)
@@ -45,11 +48,9 @@ namespace CityBikeAPI.Controllers
                 return StatusCode(400, "Required query parameters are rowsPerPage (value between 1...500) and page (>= 0).");
             }
 
-            PaginatedStations stations = new();
-
             try
             {
-                stations = _repository.GetStations(name, address, city, sortBy, sortDir, rowsPerPage, page, clientLanguage);
+                PaginatedStations stations = _repository.GetStations(name, address, city, sortBy, sortDir, rowsPerPage, page, clientLanguage);
                 if (stations.Stations.Count == 0)
                 {
                     return StatusCode(404, stations);
@@ -64,23 +65,25 @@ namespace CityBikeAPI.Controllers
             }
         }
 
+
         /// <summary>
-        /// Get request to api/stations/{id}/details. Optional parameters statsFrom and statsTo define the timeframe, from which the statistics will be calculated.
-        /// If both are omitted, statistics will be calculated from the beginning until the current date.
-        /// Returns IActionResult with instance of StationDetails-class, if no exception is caught.
+        /// Returns object of stations statistical details by station id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="statsFrom"></param>
-        /// <param name="statsTo"></param>
-        /// <returns></returns>
+        /// <param name="id">Station Id</param>
+        /// <param name="statsFrom" example="2021-05-01">Optional: Starting date for statistics calculation.</param>
+        /// <param name="statsTo" example="2021-06-01">Optional: End date for statistics calculation.</param>
+        /// <response code="200">StationDetails-object</response>
+        /// <response code="404">Empty StationDetails-object</response>
+        /// <response code="500">Unexpected error</response>
         [HttpGet("{id}/details")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public IActionResult GetDetailsOfStation([FromRoute] int id, [FromQuery] DateTime? statsFrom, [FromQuery] DateTime? statsTo)
         {
-            StationDetails details = new();
-
             try
             {
-                details = _repository.GetStationDetails(id, statsFrom, statsTo);
+                StationDetails details = _repository.GetStationDetails(id, statsFrom, statsTo);
                 if (details.StationId <= 0)
                 {
                     return StatusCode(404, details);
