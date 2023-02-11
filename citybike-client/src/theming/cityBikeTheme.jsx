@@ -10,6 +10,9 @@ export const theme = createTheme({
           background: {
                default: grey[200],
           },
+          secondary: {
+               main: yellow["A400"],
+          },
      },
      components: {
           MuiAppBar: {
@@ -52,6 +55,16 @@ export const theme = createTheme({
                               textAlign: "center",
                          },
                     },
+               },
+          },
+          MuiFab: {
+               styleOverrides: {
+                    // root: {
+                    //      background: yellow["A400"],
+                    // },
+                    // primary: {
+                    //      background: yellow,
+                    // },
                },
           },
      },

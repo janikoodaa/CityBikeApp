@@ -1,4 +1,9 @@
 {
+     "addNewTrip": {
+          "fin": "Lisää uusi matka",
+          "swe": "Tillsätt en ny resa",
+          "eng": "Add a new trip"
+     },
      "averageDistanceFromStation": {
           "fin": "Tältä asemalta tehtyjen matkojen keskipituus, km",
           "swe": "Genomsnittligt avstånd för en resa med start från denna station, km",
@@ -28,11 +33,6 @@
           "fin": "Lähtö",
           "swe": "Avgång",
           "eng": "Departure"
-     },
-     "returnDate": {
-          "fin": "Paluu",
-          "swe": "Återkomst",
-          "eng": "Return"
      },
      "departureDateFrom": {
           "fin": "Lähtö, alkaen",
@@ -79,10 +79,25 @@
           "swe": "Operator",
           "eng": "Operator"
      },
+     "returnDate": {
+          "fin": "Paluu",
+          "swe": "Återkomst",
+          "eng": "Return"
+     },
      "returnStationName": {
           "fin": "Paluuasema",
           "swe": "Återkomst station",
           "eng": "Return station"
+     },
+     "save": {
+          "fin": "Tallenna",
+          "swe": "Spar",
+          "eng": "Save"
+     },
+     "saveFailed": {
+          "fin": "Tallennus epäonnistui",
+          "swe": "Spara misslyckades",
+          "eng": "Saving failed"
      },
      "stationAddress": {
           "fin": "Osoite",
@@ -118,6 +133,11 @@
           "fin": "matkaa",
           "swe": "resor",
           "eng": "trips"
+     },
+     "tripSaved": {
+          "fin": "Matka tallennettu",
+          "swe": "Resan sparat",
+          "eng": "Trip saved"
      },
      "tripsCountFromStation": {
           "fin": "Tältä asemalta tehtyjen matkojen määrä",
