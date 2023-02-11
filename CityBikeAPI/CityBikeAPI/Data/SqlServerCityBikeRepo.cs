@@ -122,13 +122,13 @@ namespace CityBikeAPI.Data
                                 if (clientLanguage.ToLower() == "eng") query += " s.NameEng ";
                             }
                             // Order direction
-                            if (sortDir?.ToLower() == "asc")
+                            if (sortDir?.ToLower() == "desc")
                             {
-                                query += " asc ";
+                                query += " desc ";
                             }
                             else
                             {
-                                query += " desc ";
+                                query += " asc ";
                             }
                             // Pagination
                             query += $" offset @Offset rows fetch next @RowsPerPage rows only ";
